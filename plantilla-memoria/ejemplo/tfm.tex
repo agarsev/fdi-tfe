@@ -3,6 +3,7 @@
 \titulo{Una aplicación avanzada del TFE-UCMFDI}
 \tituloEN{An advanced application of TFE-UCMFDI}
 \autor{Elena Pérez Sanz}
+\calificacion{Sobresaliente (10)}
 \tutor{Prof. Fernando Gómez}
 \cotutor{Prof. Gloria Vázquez}
 \titulacion{Ingeniería Informática}
@@ -17,14 +18,8 @@
 
 \makeportada
 
-\begin{resumen}
-Esta memoria ilustra el uso de la plantilla para un Trabajo de Fin
-de Máster. La normativa exige extensión mínima de 50 páginas,
-introducción y conclusiones traducidas al inglés en caso de
-redactar en castellano, y resumen bilingüe con palabras clave.
-\palabrasClave{LaTeX, plantilla, TFM, memoria, Facultad de Informática}
-\end{resumen}
-
+% Normativa TFM punto 6: el resumen en inglés va primero (approx. media página),
+% seguido del resumen en castellano.
 \begin{abstract}
 This report showcases the template applied to a Master's Thesis.
 Regulations require at least 50 pages, introduction and conclusions
@@ -33,11 +28,25 @@ abstract with keywords.
 \keywords{LaTeX, template, master's thesis, report, Computer Science Faculty}
 \end{abstract}
 
+\begin{resumen}
+Esta memoria ilustra el uso de la plantilla para un Trabajo de Fin
+de Máster. La normativa exige extensión mínima de 50 páginas,
+introducción y conclusiones traducidas al inglés en caso de
+redactar en castellano, y resumen bilingüe con palabras clave.
+\palabrasClave{LaTeX, plantilla, TFM, memoria, Facultad de Informática}
+\end{resumen}
+
 \tableofcontents
 
 \input{capitulos/introduccion}
 \input{capitulos/desarrollo}
 \input{capitulos/conclusiones}
+
+% Normativa TFM punto 6: cuando la memoria está en castellano, la introducción
+% y las conclusiones deben traducirse al inglés y aparecer como capítulos
+% al final de la memoria.
+\input{capitulos/introduccion-en}
+\input{capitulos/conclusiones-en}
 
 \printbibliography[heading=bibintoc]
 

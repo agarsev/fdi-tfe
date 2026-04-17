@@ -3,11 +3,15 @@
 \titulo{Un sistema para ilustrar la plantilla fdi-memoria}
 \tituloEN{A system to showcase the fdi-memoria template}
 \autor{Ana García López}
+% \calificacion{Notable (8)}
 \autor{Bruno Martín Ruiz}
+% \calificacion{Sobresaliente (10)}
 \director{Prof. Carmen Díaz}
 \codirector{Prof. Diego Romero}
 \titulacion{Ingeniería Informática}
 \cursoAcademico{2024/2025}
+% Versión final: una calificación por autor (en el mismo orden que \autor).
+% Para versión de entrega, comentar las dos líneas siguientes.
 
 \palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática}
 \keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty}
@@ -41,6 +45,22 @@ keyword environments, and biblatex integration.
 \input{capitulos/introduccion}
 \input{capitulos/desarrollo}
 \input{capitulos/conclusiones}
+% Normativa V.4 (TFG): se requieren conclusiones en inglés.
+\input{capitulos/conclusiones-en}
+
+% Normativa V.5: en trabajos en grupo cada autor debe incluir al menos
+% dos páginas describiendo su contribución personal al proyecto.
+\chapter*{Contribución de Ana García López}
+\addcontentsline{toc}{chapter}{Contribución de Ana García López}
+
+Descripción de las tareas asumidas por Ana: diseño de la arquitectura,
+implementación del módulo X, redacción de los capítulos Y y Z\ldots
+
+\chapter*{Contribución de Bruno Martín Ruiz}
+\addcontentsline{toc}{chapter}{Contribución de Bruno Martín Ruiz}
+
+Descripción de las tareas asumidas por Bruno: integración con el sistema
+externo, batería de pruebas, redacción de los capítulos W y V\ldots
 
 \printbibliography[heading=bibintoc]
 

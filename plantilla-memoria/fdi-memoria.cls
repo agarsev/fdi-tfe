@@ -106,12 +106,15 @@
 \newcommand{\tituloEN}[1]{\def\@tituloEN{#1}}
 \def\@tituloEN{}
 
-% Autor: almacén propio que admite varias llamadas (una por autor) o
-% una sola con \\ como separador. Mantenemos una versión sin \\ en
-% \@author para los metadatos PDF.
+% Autor: almacén propio que admite varias llamadas (una por autor).
+% Guarda lista con \\ para portada y versión plana para metadatos PDF.
+% Cada autor también se almacena en \tfe@autor@N para emparejar con notas.
 \def\tfe@autores{}
 \def\tfe@autoresPlain{}
+\newcounter{tfe@nautores}
 \newcommand{\autor}[1]{%
+  \stepcounter{tfe@nautores}%
+  \expandafter\def\csname tfe@autor@\the\value{tfe@nautores}\endcsname{#1}%
   \ifx\tfe@autores\@empty
     \def\tfe@autores{#1}%
     \def\tfe@autoresPlain{#1}%
@@ -140,14 +143,21 @@
 \newcommand{\titulacion}[1]{\def\tfe@titulacion{#1}}
 \def\tfe@titulacion{}
 
-% Curso académico, convocatoria y calificación (estos dos últimos,
-% solo en la versión final según normativa).
+% Curso académico y convocatoria (solo en versión final según normativa).
 \newcommand{\cursoAcademico}[1]{\def\tfe@curso{#1}}
 \newcommand{\convocatoria}[1]{\def\tfe@convocatoria{#1}}
-\newcommand{\calificacion}[1]{\def\tfe@calificacion{#1}}
 \def\tfe@curso{}
 \def\tfe@convocatoria{}
-\def\tfe@calificacion{}
+
+% Calificación: admite varias llamadas (una por autor), paralelas a \autor.
+% La i-ésima \calificacion corresponde al i-ésimo \autor.
+% Si hay varios autores y sólo una calificación se emite un aviso.
+\newcounter{tfe@ncalificaciones}
+\newcounter{tfe@ical}   % contador de iteración para portadaFinal
+\newcommand{\calificacion}[1]{%
+  \stepcounter{tfe@ncalificaciones}%
+  \expandafter\def\csname tfe@cal@\the\value{tfe@ncalificaciones}\endcsname{#1}%
+}
 
 % Palabras clave
 \newcommand{\palabrasClave}[1]{\def\tfe@palabrasClave{#1}}
@@ -194,7 +204,6 @@
       \ClassWarning{fdi-memoria}{Falta \string\titulacion{...}}%
     }{ en \tfe@titulacion}%
   \else
-    \tfe@tipoDoc\\
     \ifdefempty{\tfe@titulacion}{%
       \ClassWarning{fdi-memoria}{Falta \string\titulacion{...}}%
     }{Máster en \tfe@titulacion}%
@@ -218,9 +227,32 @@
   \fi
 }
 
+% Renderiza calificaciones emparejadas con autores.
+% Con una sola calificación: "Calificación: X". Con varias: "Autor — Nota"
+% por pares (la i-ésima calificación corresponde al i-ésimo autor).
 \newcommand{\tfe@portadaFinal}{%
   \ifdefempty{\tfe@convocatoria}{}{Convocatoria: \tfe@convocatoria\par}%
-  \ifdefempty{\tfe@calificacion}{}{Calificación: \tfe@calificacion\par}%
+  \ifnumequal{\value{tfe@ncalificaciones}}{0}{}{%
+    \ifnumgreater{\value{tfe@nautores}}{1}{%
+      \ifnumless{\value{tfe@ncalificaciones}}{\value{tfe@nautores}}{%
+        \ClassWarning{fdi-memoria}{%
+          Hay \the\value{tfe@nautores}\space autores pero solo
+          \the\value{tfe@ncalificaciones}\space calificacion(es).
+          Use \string\calificacion{} una vez por cada autor.}%
+      }{}%
+    }{}%
+    \ifnumequal{\value{tfe@ncalificaciones}}{1}{%
+      Calificación: \csname tfe@cal@1\endcsname\par
+    }{%
+      \setcounter{tfe@ical}{0}%
+      \loop
+        \stepcounter{tfe@ical}%
+        \csname tfe@autor@\the\value{tfe@ical}\endcsname~---~%
+        \csname tfe@cal@\the\value{tfe@ical}\endcsname\par
+      \ifnum\value{tfe@ical}<\value{tfe@ncalificaciones}%
+      \repeat
+    }%
+  }%
 }
 
 \newcommand{\makeportada}{%
@@ -300,12 +332,12 @@
 }
 
 %%----------------------------------------------------------------------
-%% 8. Bibliografía: biblatex con backend biber
+%% 9. Bibliografía: biblatex con backend biber
 %%----------------------------------------------------------------------
 \RequirePackage[backend=biber, style=\tfe@estilobib]{biblatex}
 
 %%----------------------------------------------------------------------
-%% 9. hyperref al final del preámbulo (debe ir el último)
+%% 10. hyperref al final del preámbulo (debe ir el último)
 %%----------------------------------------------------------------------
 \AtEndPreamble{%
   \RequirePackage[pdfusetitle, hidelinks, pdfdisplaydoctitle]{hyperref}%
