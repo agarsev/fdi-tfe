@@ -1,0 +1,20 @@
+\chapter{Desarrollo}
+
+El cuerpo principal de la memoria describe el trabajo realizado.
+En este ejemplo, demostramos algunas construcciones típicas: una
+cita bibliográfica~\cite{knuth1986}, referencias cruzadas a la
+sección~\ref{sec:arquitectura}, y una figura.
+
+\section{Arquitectura}
+\label{sec:arquitectura}
+
+La arquitectura del sistema sigue el patrón de separación entre
+normativa y estilo. La clase \texttt{tfe-ucmfdi} implementa los
+requisitos obligatorios de la normativa UCM-FDI; el aspecto
+visual concreto queda delegado a la opción \texttt{estilo}.
+
+\section{Implementación}
+
+La implementación se basa en la clase KOMA-Script
+\texttt{scrreport}, con soporte nativo para UTF-8 mediante
+LuaLaTeX.

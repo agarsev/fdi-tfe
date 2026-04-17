@@ -1,0 +1,47 @@
+\documentclass[tfg, estilo=minimo]{fdi-memoria}
+
+\titulo{Un sistema para ilustrar la plantilla fdi-memoria}
+\tituloEN{A system to showcase the fdi-memoria template}
+\autor{Ana García López}
+\autor{Bruno Martín Ruiz}
+\director{Prof. Carmen Díaz}
+\codirector{Prof. Diego Romero}
+\titulacion{Ingeniería Informática}
+\cursoAcademico{2024/2025}
+
+\palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática}
+\keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty}
+
+\addbibresource{bibliografia.bib}
+
+\begin{document}
+
+\makeportada
+
+\begin{resumen}
+Este documento demuestra el uso de la plantilla \texttt{fdi-memoria}
+para redactar la memoria de un Trabajo de Fin de Grado en la
+Facultad de Informática de la Universidad Complutense de Madrid. La
+plantilla incluye la portada normalizada, entornos bilingües para
+resumen y palabras clave, e integración con biblatex.
+\palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática, Universidad Complutense de Madrid}
+\end{resumen}
+
+\begin{abstract}
+This document demonstrates the \texttt{fdi-memoria} template for
+writing the report of a Bachelor's Thesis at the Faculty of
+Computer Science of the Complutense University of Madrid. The
+template provides a normalized cover page, bilingual abstract and
+keyword environments, and biblatex integration.
+\keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty, Complutense University of Madrid}
+\end{abstract}
+
+\tableofcontents
+
+\input{capitulos/introduccion}
+\input{capitulos/desarrollo}
+\input{capitulos/conclusiones}
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

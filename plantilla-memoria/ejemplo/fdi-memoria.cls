@@ -1,0 +1,1 @@
+../fdi-memoria.cls
