@@ -34,7 +34,7 @@
 %%   estilobib=<style>      Estilo biblatex (defecto: authoryear)
 %%                          Otros valores habituales: numeric, alphabetic.
 %%                          Véase https://biblatex-biber.sourceforge.net/
-%%   cualquier otra opción se pasa a scrreport.
+%%   cualquier otra opción se pasa a scrbook.
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
@@ -52,18 +52,20 @@
 \DeclareStringOption[es]{idioma}
 \DeclareStringOption[authoryear]{estilobib}
 
-\DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{scrreport}}
+\DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{scrbook}}
 \ProcessKeyvalOptions*\relax
 
 % tfm implica !tfg
 \iftfe@tfm \tfe@tfgfalse \fi
 
 %%----------------------------------------------------------------------
-%% 2. Clase base: scrreport (KOMA-Script). parskip=half- da media
-%%    línea de separación entre párrafos sin sangría, adecuado para PDF
-%%    digital. DIV=12 da márgenes generosos estándar KOMA.
+%% 2. Clase base: scrbook (KOMA-Script). Usamos scrbook en lugar de
+%%    scrreport para disponer de \frontmatter/\mainmatter/\backmatter.
+%%    Por defecto forzamos oneside para un aspecto digital; el estilo
+%%    texis reactiva twoside más abajo. parskip=half- da media línea
+%%    entre párrafos sin sangría; DIV=12 da márgenes generosos.
 %%----------------------------------------------------------------------
-\LoadClass[11pt, a4paper, DIV=12, parskip=half-, numbers=noenddot]{scrreport}
+\LoadClass[11pt, a4paper, oneside, DIV=12, parskip=half-, numbers=noenddot]{scrbook}
 
 %%----------------------------------------------------------------------
 %% 3. Motor y paquetes base
@@ -302,9 +304,9 @@
   }%
 }
 
-% Redefinimos abstract (KOMA lo tiene como entorno de titlepage): lo
-% queremos como capítulo bilingüe paralelo a `resumen`.
-\renewenvironment{abstract}{%
+% scrbook no define `abstract` (a diferencia de scrreport). Lo creamos
+% como capítulo bilingüe paralelo a `resumen`.
+\newenvironment{abstract}{%
   \chapter*{Abstract}%
   \addcontentsline{toc}{chapter}{Abstract}%
   \ifdefempty{\@tituloEN}{}{\noindent\textit{\@tituloEN}\par\medskip}%
@@ -321,14 +323,54 @@
 %% tipográficos, no una hoja de estilo completa.
 %%----------------------------------------------------------------------
 
+% Definimos los comandos de marca aquí fuera porque dentro del cuerpo de
+% \ifdefstring el carácter # requiere un escapado incómodo (##).
+\newcommand{\tfe@chaptermarkTeXiS}[1]{%
+  \markboth{\textsc{\chaptername\ \thechapter.}\ #1}{}%
+}
+\newcommand{\tfe@sectionmarkTeXiS}[1]{\markright{\thesection.\ #1}}
+
 \ifdefstring{\tfe@estilo}{texis}{%
-  % Estilo reminiscente de TeXiS: párrafos con sangría tradicional
-  % y separación mínima, línea ligeramente más holgada.
-  \KOMAoptions{parskip=false}%
+  % Estilo reminiscente de TeXiS. Replica los rasgos visuales más
+  % característicos de la plantilla clásica sin cambiar la clase base.
+
+  % Párrafos: sangría tradicional, separación mínima, interlineado holgado.
+  % twoside = páginas pares/impares distintas y saltos a recto al cambiar
+  % de capítulo (como un libro).
+  \KOMAoptions{parskip=false, twoside=true, open=right, chapterprefix=true, DIV=8, BCOR=7mm}%
+  % Ajuste vertical fino: KOMA DIV=8 da top≈37mm y bottom≈74mm (ratio 1:2);
+  % desplazamos el bloque 10mm hacia abajo y lo extendemos 20mm para aproximar
+  % el layout de TeXiS (book 11pt a4paper): top≈47mm, bottom≈44mm.
+  \addtolength{\topmargin}{8mm}%
+  \addtolength{\textheight}{14mm}%
   \setlength{\parskip}{0.2ex}%
   \linespread{1.05}%
+
+  % Títulos en serif (KOMA los pone sans por defecto).
+  \addtokomafont{disposition}{\rmfamily}%
+
+  % Cabeceras estilo TeXiS: regla fina, capítulo en versalitas en páginas
+  % pares, sección en impares, número de página en el borde exterior.
+  \RequirePackage{fancyhdr}%
+  \pagestyle{fancy}%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0.2pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+  \addtolength{\headheight}{2pt}%
+  \let\chaptermark\tfe@chaptermarkTeXiS
+  \let\sectionmark\tfe@sectionmarkTeXiS
+  \fancyhead[LO]{\rightmark}%
+  \fancyhead[RE]{\leftmark}%
+  \fancyhead[RO,LE]{\thepage}%
+  % Primera página de capítulo: sin regla superior, nº al pie borde exterior.
+  \fancypagestyle{plain}{%
+    \fancyhf{}%
+    \fancyfoot[RO,LE]{\thepage}%
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+  }%
 }{%
-  % minimo: defaults de KOMA (parskip=half-, sin sangría)
+  % minimo: defaults de KOMA (parskip=half-, sin sangría, titulares sans)
 }
 
 %%----------------------------------------------------------------------

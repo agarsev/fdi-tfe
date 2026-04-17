@@ -12,11 +12,16 @@
 \palabrasClave{LaTeX, plantilla, TFM, Facultad de Informática}
 \keywords{LaTeX, template, master's thesis, Computer Science Faculty}
 
+\usepackage{lipsum}
+
 \addbibresource{bibliografia.bib}
 
 \begin{document}
 
 \makeportada
+
+% \frontmatter numera en romanos hasta \mainmatter (scrbook). Opcional.
+\frontmatter
 
 % Normativa TFM punto 6: el resumen en inglés va primero (approx. media página),
 % seguido del resumen en castellano.
@@ -38,6 +43,8 @@ redactar en castellano, y resumen bilingüe con palabras clave.
 
 \tableofcontents
 
+\mainmatter
+
 \input{capitulos/introduccion}
 \input{capitulos/desarrollo}
 \input{capitulos/conclusiones}
@@ -47,6 +54,8 @@ redactar en castellano, y resumen bilingüe con palabras clave.
 % al final de la memoria.
 \input{capitulos/introduccion-en}
 \input{capitulos/conclusiones-en}
+
+\backmatter
 
 \printbibliography[heading=bibintoc]
 

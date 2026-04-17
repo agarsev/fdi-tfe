@@ -16,11 +16,19 @@
 \palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática}
 \keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty}
 
+\usepackage{lipsum}
+
 \addbibresource{bibliografia.bib}
 
 \begin{document}
 
 \makeportada
+
+% \frontmatter / \mainmatter / \backmatter vienen de scrbook. No son
+% obligatorios: si los quitas, las páginas se numeran en arábigos corridos
+% desde el principio. Con \frontmatter se numeran en romanos hasta la
+% primera llamada a \mainmatter.
+\frontmatter
 
 \begin{resumen}
 Este documento demuestra el uso de la plantilla \texttt{fdi-memoria}
@@ -42,11 +50,15 @@ keyword environments, and biblatex integration.
 
 \tableofcontents
 
+\mainmatter
+
 \input{capitulos/introduccion}
 \input{capitulos/desarrollo}
 \input{capitulos/conclusiones}
 % Normativa V.4 (TFG): se requieren conclusiones en inglés.
 \input{capitulos/conclusiones-en}
+
+\backmatter
 
 % Normativa V.5: en trabajos en grupo cada autor debe incluir al menos
 % dos páginas describiendo su contribución personal al proyecto.
