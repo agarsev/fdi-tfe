@@ -28,12 +28,15 @@
 %%   \end{document}
 %%
 %% Opciones de clase:
-%%   tfg | tfm              Tipo de documento (defecto: tfg)
-%%   estilo=minimo|texis    Estilo visual (defecto: minimo)
-%%   idioma=es|en           Idioma principal (defecto: es)
-%%   estilobib=<style>      Estilo biblatex (defecto: authoryear)
-%%                          Otros valores habituales: numeric, alphabetic.
-%%                          Véase https://biblatex-biber.sourceforge.net/
+%%   tfg | tfm               Tipo de documento (defecto: tfg)
+%%   estilo=minimo|texis     Estilo del cuerpo (defecto: minimo)
+%%   portada=normativa|texis Estilo de la portada (defecto: normativa).
+%%                           Es ortogonal a `estilo`: puede combinarse
+%%                           cualquier portada con cualquier estilo.
+%%   idioma=es|en            Idioma principal (defecto: es)
+%%   estilobib=<style>       Estilo biblatex (defecto: authoryear)
+%%                           Otros valores habituales: numeric, alphabetic.
+%%                           Véase https://biblatex-biber.sourceforge.net/
 %%   cualquier otra opción se pasa a scrbook.
 %%----------------------------------------------------------------------
 
@@ -49,6 +52,7 @@
 \DeclareBoolOption[true]{tfg}
 \DeclareBoolOption{tfm}
 \DeclareStringOption[minimo]{estilo}
+\DeclareStringOption[normativa]{portada}
 \DeclareStringOption[es]{idioma}
 \DeclareStringOption[authoryear]{estilobib}
 
@@ -167,14 +171,55 @@
 \def\tfe@palabrasClave{}
 \def\tfe@keywords{}
 
-% Tipo de documento (derivado de las opciones)
+%%----------------------------------------------------------------------
+%% 4.b Rótulos según idioma
+%%
+%% Textos que aparecen en la portada y otros elementos generados por la
+%% plantilla. Se eligen en carga de clase según \tfe@idioma. Los entornos
+%% `resumen` y `abstract` NO usan estos macros: por normativa siempre van
+%% en castellano e inglés respectivamente.
+%%----------------------------------------------------------------------
+\ifdefstring{\tfe@idioma}{en}{%
+  \def\tfe@text@tipoDocTFG{Bachelor's Thesis}%
+  \def\tfe@text@tipoDocTFM{Master's Thesis}%
+  \def\tfe@text@enTitulacion{ in }%
+  \def\tfe@text@prefijoMaster{Master's in }%
+  \def\tfe@text@facultad{Faculty of Computer Science, Complutense University of Madrid}%
+  \def\tfe@text@director{Supervisor}%
+  \def\tfe@text@codirector{Co-supervisor}%
+  \def\tfe@text@tutor{Supervisor}%
+  \def\tfe@text@cotutor{Co-supervisor}%
+  \def\tfe@text@colabExt{External collaborator}%
+  \def\tfe@text@cursoAcademico{Academic year}%
+  \def\tfe@text@convocatoria{Session}%
+  \def\tfe@text@calificacion{Grade}%
+}{%
+  \def\tfe@text@tipoDocTFG{Trabajo de Fin de Grado}%
+  \def\tfe@text@tipoDocTFM{Trabajo de Fin de Máster}%
+  \def\tfe@text@enTitulacion{ en }%
+  \def\tfe@text@prefijoMaster{Máster en }%
+  \def\tfe@text@facultad{Facultad de Informática, Universidad Complutense de Madrid}%
+  \def\tfe@text@director{Director}%
+  \def\tfe@text@codirector{Codirector}%
+  \def\tfe@text@tutor{Tutor}%
+  \def\tfe@text@cotutor{Cotutor}%
+  \def\tfe@text@colabExt{Colaborador externo}%
+  \def\tfe@text@cursoAcademico{Curso académico}%
+  \def\tfe@text@convocatoria{Convocatoria}%
+  \def\tfe@text@calificacion{Calificación}%
+}
+
+% Tipo de documento (derivado de las opciones e idioma)
 \iftfe@tfg
-  \def\tfe@tipoDoc{Trabajo de Fin de Grado}
-  \def\tfe@tipoDocEN{Bachelor's Thesis}
+  \let\tfe@tipoDoc\tfe@text@tipoDocTFG
 \else
-  \def\tfe@tipoDoc{Trabajo de Fin de Máster}
-  \def\tfe@tipoDocEN{Master's Thesis}
+  \let\tfe@tipoDoc\tfe@text@tipoDocTFM
 \fi
+
+% Logo de portada. El estudiante puede redefinir la ruta con \logo{...}
+% si guarda el escudo en otra ubicación (p. ej. \logo{img/Escudo_UCM}).
+\newcommand{\logo}[1]{\def\tfe@logo{#1}}
+\def\tfe@logo{Escudo_UCM}
 
 %%----------------------------------------------------------------------
 %% 5. Portada normativa
@@ -191,7 +236,7 @@
 %%----------------------------------------------------------------------
 
 \newcommand{\tfe@portadaEscudo}{%
-  \includegraphics[height=3.5cm]{Escudo_UCM}%
+  \includegraphics[height=3.5cm]{\tfe@logo}%
 }
 
 % Rótulo según normativa: para TFG "Trabajo de Fin de Grado en X",
@@ -204,28 +249,28 @@
     \tfe@tipoDoc%
     \ifdefempty{\tfe@titulacion}{%
       \ClassWarning{fdi-simplex}{Falta \string\titulacion{...}}%
-    }{ en \tfe@titulacion}%
+    }{\tfe@text@enTitulacion \tfe@titulacion}%
   \else
     \ifdefempty{\tfe@titulacion}{%
       \ClassWarning{fdi-simplex}{Falta \string\titulacion{...}}%
-    }{Máster en \tfe@titulacion}%
+    }{\tfe@text@prefijoMaster \tfe@titulacion}%
   \fi
   \\
-  Facultad de Informática, Universidad Complutense de Madrid%
+  \tfe@text@facultad%
 }
 
 \newcommand{\tfe@portadaDirector}{%
   \iftfe@tfg
     \ifdefempty{\tfe@director}{%
       \ClassWarning{fdi-simplex}{Falta \string\director{...}}%
-    }{Director:\\ \tfe@director}%
-    \ifdefempty{\tfe@codirector}{}{\\[0.4em] Codirector:\\ \tfe@codirector}%
+    }{\tfe@text@director:\\ \tfe@director}%
+    \ifdefempty{\tfe@codirector}{}{\\[0.4em] \tfe@text@codirector:\\ \tfe@codirector}%
   \else
     \ifdefempty{\tfe@tutor}{%
       \ClassWarning{fdi-simplex}{Falta \string\tutor{...}}%
-    }{Tutor:\\ \tfe@tutor}%
-    \ifdefempty{\tfe@cotutor}{}{\\[0.4em] Cotutor:\\ \tfe@cotutor}%
-    \ifdefempty{\tfe@colabExt}{}{\\[0.4em] Colaborador externo:\\ \tfe@colabExt}%
+    }{\tfe@text@tutor:\\ \tfe@tutor}%
+    \ifdefempty{\tfe@cotutor}{}{\\[0.4em] \tfe@text@cotutor:\\ \tfe@cotutor}%
+    \ifdefempty{\tfe@colabExt}{}{\\[0.4em] \tfe@text@colabExt:\\ \tfe@colabExt}%
   \fi
 }
 
@@ -233,7 +278,7 @@
 % Con una sola calificación: "Calificación: X". Con varias: "Autor — Nota"
 % por pares (la i-ésima calificación corresponde al i-ésimo autor).
 \newcommand{\tfe@portadaFinal}{%
-  \ifdefempty{\tfe@convocatoria}{}{Convocatoria: \tfe@convocatoria\par}%
+  \ifdefempty{\tfe@convocatoria}{}{\tfe@text@convocatoria: \tfe@convocatoria\par}%
   \ifnumequal{\value{tfe@ncalificaciones}}{0}{}{%
     \ifnumgreater{\value{tfe@nautores}}{1}{%
       \ifnumless{\value{tfe@ncalificaciones}}{\value{tfe@nautores}}{%
@@ -244,7 +289,7 @@
       }{}%
     }{}%
     \ifnumequal{\value{tfe@ncalificaciones}}{1}{%
-      Calificación: \csname tfe@cal@1\endcsname\par
+      \tfe@text@calificacion: \csname tfe@cal@1\endcsname\par
     }{%
       \setcounter{tfe@ical}{0}%
       \loop
@@ -257,22 +302,17 @@
   }%
 }
 
-\newcommand{\makeportada}{%
+% Portada "normativa": layout limpio y funcional con los campos que
+% exige la normativa de la FDI, sin decoraciones.
+\newcommand{\tfe@portadaNormativa}{%
   \begin{titlepage}
     \centering
     \tfe@portadaEscudo\par
     \vspace{1.2cm}
     {\large \tfe@portadaRotulo \par}
     \vfill
-    \ifdefstring{\tfe@estilo}{texis}{%
-      \rule{0.75\textwidth}{0.4pt}\\[0.8em]
-      {\huge\bfseries \@title \par}%
-      \ifdefempty{\@tituloEN}{}{\vspace{0.5em}{\Large\itshape \@tituloEN \par}}%
-      \vspace{0.8em}\rule{0.75\textwidth}{0.4pt}%
-    }{%
-      {\huge\bfseries \@title \par}%
-      \ifdefempty{\@tituloEN}{}{\vspace{0.6em}{\Large\itshape \@tituloEN \par}}%
-    }
+    {\huge\bfseries \@title \par}%
+    \ifdefempty{\@tituloEN}{}{\vspace{0.6em}{\Large\itshape \@tituloEN \par}}%
     \vfill
     {\large \tfe@autores \par}
     \vspace{0.8cm}
@@ -280,11 +320,49 @@
     \vfill
     \ifdefempty{\tfe@curso}{%
       \ClassWarning{fdi-simplex}{Falta \string\cursoAcademico{...}}%
-    }{{Curso académico \tfe@curso\par}}%
+    }{{\tfe@text@cursoAcademico\ \tfe@curso\par}}%
     \tfe@portadaFinal
   \end{titlepage}
 }
 
+% Portada reminiscente de TeXiS: título flanqueado por reglas, tipo de
+% documento en versalitas justo debajo del escudo, bloques separados
+% por \vfill. Sigue cumpliendo la normativa (mismos campos).
+\newcommand{\tfe@portadaTeXiS}{%
+  \begin{titlepage}
+    \centering
+    \mbox{}\vfill
+    \rule{0.75\textwidth}{0.5mm}\\[0.8em]
+    {\huge\bfseries \@title \par}%
+    \ifdefempty{\@tituloEN}{}{\vspace{0.5em}{\Large\itshape \@tituloEN \par}}%
+    \vspace{0.8em}\rule{0.75\textwidth}{0.5mm}%
+    \vfill
+    \tfe@portadaEscudo\par
+    \vspace{0.8em}
+    {\Large\bfseries\MakeUppercase{\tfe@tipoDoc} \par}
+    \vfill
+    {\large \tfe@autores \par}
+    \vspace{0.6cm}
+    {\tfe@portadaDirector \par}
+    \vfill
+    {\tfe@portadaRotulo \par}
+    \vspace{0.4cm}
+    \ifdefempty{\tfe@curso}{%
+      \ClassWarning{fdi-simplex}{Falta \string\cursoAcademico{...}}%
+    }{{\tfe@text@cursoAcademico\ \tfe@curso\par}}%
+    \tfe@portadaFinal
+  \end{titlepage}
+}
+
+% Dispatcher: elige la portada según la opción `portada`.
+\newcommand{\makeportada}{%
+  \ifdefstring{\tfe@portada}{texis}{\tfe@portadaTeXiS}{%
+  \ifdefstring{\tfe@portada}{normativa}{\tfe@portadaNormativa}{%
+    \ClassError{fdi-simplex}{%
+      Opción `portada=\tfe@portada' desconocida.%
+    }{Valores válidos: normativa, texis.}%
+  }}%
+}
 \let\maketitle\makeportada
 
 %%----------------------------------------------------------------------
@@ -380,9 +458,17 @@
 
 %%----------------------------------------------------------------------
 %% 10. hyperref al final del preámbulo (debe ir el último)
+%%
+%% La carga de hyperref se extrae a \tfe@hyperrefSetup para que un estilo
+%% pueda redefinirla (p. ej. `colorlinks` con paleta propia en el estilo
+%% "moderno"). Por defecto: sin color, enlaces ocultos.
 %%----------------------------------------------------------------------
-\AtEndPreamble{%
+\newcommand{\tfe@hyperrefSetup}{%
   \RequirePackage[pdfusetitle, hidelinks, pdfdisplaydoctitle]{hyperref}%
+}
+
+\AtEndPreamble{%
+  \tfe@hyperrefSetup
   \AtBeginDocument{%
     \hypersetup{%
       pdfsubject={\tfe@tipoDoc},%

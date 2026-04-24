@@ -63,9 +63,29 @@ lualatex memoria.tex
 | Opción | Valores | Defecto | Descripción |
 |---|---|---|---|
 | *(primera)* | `tfg` \| `tfm` | `tfg` | Tipo de documento |
-| `estilo` | `minimo` \| `texis` | `minimo` | Estilo visual |
+| `estilo` | `minimo` \| `texis` | `minimo` | Estilo del cuerpo del documento |
+| `portada` | `normativa` \| `texis` | `normativa` | Estilo de la portada |
 | `idioma` | `es` \| `en` | `es` | Idioma principal |
 | `estilobib` | cualquier estilo biblatex | `authoryear` | Estilo bibliográfico |
+
+### Combinar estilo y portada
+
+`estilo` (cuerpo del documento) y `portada` son ortogonales: cualquier
+combinación es válida. Ejemplos:
+
+```latex
+\documentclass[tfg]{fdi-simplex}                              % minimo + normativa
+\documentclass[tfm, estilo=texis, portada=texis]{fdi-simplex} % clásico TeXiS
+\documentclass[tfg, portada=texis]{fdi-simplex}               % cuerpo sobrio, portada clásica
+```
+
+- `estilo=minimo` — defaults de KOMA: oneside, sans-serif en títulos,
+  cabeceras limpias.
+- `estilo=texis` — twoside, serif, cabeceras con regla y versalitas
+  (reminiscente de la plantilla TeXiS).
+- `portada=normativa` — portada limpia con los campos de la normativa.
+- `portada=texis` — título flanqueado por reglas, tipo de documento en
+  versalitas bajo el escudo (inspirada en TeXiS).
 
 ### Cambiar el estilo bibliográfico
 

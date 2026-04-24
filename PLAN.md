@@ -24,39 +24,32 @@ de estudios de la facultad de informatica.
       `plantilla-memoria/` → `fdi-simplex/`.
 - [x] Actualizar `\ProvidesClass`, `\ClassWarning`, README, ejemplos
       (`tfg.tex`, `tfm.tex`) y Makefile.
-- [ ] (Opcional, antes de publicar) Verificación final de colisiones
-      en CTAN — `simplex` existe (paquete para ejemplos numerados) pero
-      `fdi-simplex` debería estar libre.
 
 ### 2. Refactor previo (prerrequisito de #3 y #4)
 
 Cosas que conviene tocar **antes** de añadir portadas y estilo nuevos,
 porque si no habrá que retocarlas en cada portada/estilo nuevo.
 
-- [ ] Verificar qué pasa hoy con `idioma=en`: rótulos hardcoded en
+- [x] Verificar qué pasa hoy con `idioma=en`: rótulos hardcoded en
       castellano dentro de portada y entornos
       (`Resumen`/`Abstract`, `Palabras clave`/`Keywords`,
       `Curso académico`, `Director`/`Tutor`, `Codirector`,
       `Calificación`, `Convocatoria`, `Colaborador externo`,
-      `Facultad de Informática...`).
-- [ ] Internacionalizar dichos rótulos con `\addto\captions<lang>` o
-      con macros tipo `\tfe@text@director` que se redefinan según
-      `\tfe@idioma`. Con esto las portadas nuevas no tienen que
-      preocuparse por el idioma.
-- [ ] Parametrizar la carga de `hyperref` (`fdi-simplex.cls:385`):
-      hoy va con `hidelinks` para todos los estilos. Extraerlo a una
-      macro `\tfe@hyperrefSetup` que cada estilo pueda redefinir
-      (e. g. `colorlinks` + paleta para `moderno`).
-- [ ] (Pequeño preparativo) Extraer la portada actual a una macro
-      `\tfe@portadaNormativa` aunque siga siendo la única, para que
-      añadir las otras dos en #3 sea sólo "añadir un comando más".
-- [ ] Hacer configurable la ruta del logo UCM. Hoy
-      `\tfe@portadaEscudo` hardcodea `Escudo_UCM`
-      (`fdi-simplex.cls:194`); añadir un comando `\logo{<path>}` (con
-      default `Escudo_UCM`) para que el estudiante pueda colocar el
-      escudo donde quiera dentro de su proyecto (p. ej. en una
-      subcarpeta `img/`). Esto deja la API lista para que cada portada
-      de #3 use `\logo` en lugar de la ruta literal.
+      `Facultad de Informática...`). Los entornos `resumen` y
+      `abstract` se quedan fijos (normativa exige ambos idiomas); el
+      resto sí se internacionaliza.
+- [x] Internacionalizar dichos rótulos con macros `\tfe@text@*` que se
+      eligen según `\tfe@idioma` en el bloque §4.b del `.cls`. Con
+      esto las portadas nuevas no tienen que preocuparse por el
+      idioma.
+- [x] Parametrizar la carga de `hyperref`: extraído a
+      `\tfe@hyperrefSetup`. Un estilo puede redefinirlo (e. g.
+      `colorlinks` + paleta para `moderno`).
+- [x] Extraer la portada actual a una macro `\tfe@portadaNormativa`;
+      `\makeportada` la llama. Añadir otra portada en #3 es sólo
+      "definir su macro y que `\makeportada` haga dispatch".
+- [x] Hacer configurable la ruta del logo UCM: `\logo{<path>}` con
+      default `Escudo_UCM`.
 
 ### 3. Separar portadas del estilo
 
@@ -64,18 +57,23 @@ Hoy la portada está acoplada al `.cls` y sólo cambia un detalle según
 `estilo=texis|minimo`. Se quiere desacoplar para poder combinar
 libremente estilo (cuerpo del documento) y portada.
 
-- [ ] Añadir opción de clase `portada=normativa|texis|moderna`
-      (default: `normativa`).
-- [ ] Hacer que `\makeportada` despache a `\tfe@portadaNormativa` /
-      `\tfe@portadaTeXiS` / `\tfe@portadaModerna` según la opción
-      (la primera ya existe tras #2).
-- [ ] Bajarse TeXiS (ya hay un `TeXiS-NightlyBuild-ManualSrc.zip` y
-      carpeta `TeXiS_original/`) y replicar su portada respetando
-      campos obligatorios de la normativa.
+- [x] Añadir opción de clase `portada=normativa|texis` (default:
+      `normativa`). La variante `moderna` se añadirá junto con el
+      estilo moderno (#4).
+- [x] Hacer que `\makeportada` despache a `\tfe@portadaNormativa` /
+      `\tfe@portadaTeXiS` según la opción. La portada normativa pasa
+      a ser limpia (sin decoración de reglas); las reglas alrededor
+      del título están ahora en `portada=texis`.
+- [x] Replicar portada de TeXiS: `\tfe@portadaTeXiS` imita los rasgos
+      principales del original (título flanqueado por reglas, tipo de
+      documento en versalitas bajo el escudo, rótulo y facultad al
+      pie). Sigue respetando los campos de la normativa.
 - [ ] Diseñar una portada "moderna" alternativa (limpia, con bloque de
       color, tipografía a juego con el nuevo estilo del punto 4).
-- [ ] Documentar en README las combinaciones estilo/portada y dejar
-      ejemplos en `tfg.tex` / `tfm.tex` de al menos dos combinaciones.
+      **Aplazado a #4** porque la tipografía/paleta depende del nuevo
+      estilo.
+- [x] Documentar en README las combinaciones estilo/portada. Ejemplos:
+      `tfg.tex` (minimo + normativa), `tfm.tex` (texis + texis).
 
 ### 4. Nuevo estilo "moderno"
 
