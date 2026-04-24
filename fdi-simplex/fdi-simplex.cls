@@ -1,5 +1,5 @@
 %%----------------------------------------------------------------------
-%% fdi-memoria.cls
+%% fdi-simplex.cls
 %%
 %% Plantilla LaTeX para Trabajos de Fin de Grado y Fin de Máster
 %% de la Facultad de Informática de la Universidad Complutense de Madrid.
@@ -9,7 +9,7 @@
 %%
 %% Uso mínimo:
 %%
-%%   \documentclass[tfg]{fdi-memoria}         % o [tfm]
+%%   \documentclass[tfg]{fdi-simplex}         % o [tfm]
 %%   \titulo{Título}
 %%   \tituloEN{English title}
 %%   \autor{Nombre Apellidos}
@@ -38,7 +38,7 @@
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fdi-memoria}[2026/04/17 v0.2 Plantilla TFG/TFM Facultad de Informática UCM]
+\ProvidesClass{fdi-simplex}[2026/04/17 v0.2 Plantilla TFG/TFM Facultad de Informática UCM]
 
 %%----------------------------------------------------------------------
 %% 1. Opciones de clase
@@ -203,11 +203,11 @@
   \iftfe@tfg
     \tfe@tipoDoc%
     \ifdefempty{\tfe@titulacion}{%
-      \ClassWarning{fdi-memoria}{Falta \string\titulacion{...}}%
+      \ClassWarning{fdi-simplex}{Falta \string\titulacion{...}}%
     }{ en \tfe@titulacion}%
   \else
     \ifdefempty{\tfe@titulacion}{%
-      \ClassWarning{fdi-memoria}{Falta \string\titulacion{...}}%
+      \ClassWarning{fdi-simplex}{Falta \string\titulacion{...}}%
     }{Máster en \tfe@titulacion}%
   \fi
   \\
@@ -217,12 +217,12 @@
 \newcommand{\tfe@portadaDirector}{%
   \iftfe@tfg
     \ifdefempty{\tfe@director}{%
-      \ClassWarning{fdi-memoria}{Falta \string\director{...}}%
+      \ClassWarning{fdi-simplex}{Falta \string\director{...}}%
     }{Director:\\ \tfe@director}%
     \ifdefempty{\tfe@codirector}{}{\\[0.4em] Codirector:\\ \tfe@codirector}%
   \else
     \ifdefempty{\tfe@tutor}{%
-      \ClassWarning{fdi-memoria}{Falta \string\tutor{...}}%
+      \ClassWarning{fdi-simplex}{Falta \string\tutor{...}}%
     }{Tutor:\\ \tfe@tutor}%
     \ifdefempty{\tfe@cotutor}{}{\\[0.4em] Cotutor:\\ \tfe@cotutor}%
     \ifdefempty{\tfe@colabExt}{}{\\[0.4em] Colaborador externo:\\ \tfe@colabExt}%
@@ -237,7 +237,7 @@
   \ifnumequal{\value{tfe@ncalificaciones}}{0}{}{%
     \ifnumgreater{\value{tfe@nautores}}{1}{%
       \ifnumless{\value{tfe@ncalificaciones}}{\value{tfe@nautores}}{%
-        \ClassWarning{fdi-memoria}{%
+        \ClassWarning{fdi-simplex}{%
           Hay \the\value{tfe@nautores}\space autores pero solo
           \the\value{tfe@ncalificaciones}\space calificacion(es).
           Use \string\calificacion{} una vez por cada autor.}%
@@ -279,7 +279,7 @@
     {\tfe@portadaDirector \par}
     \vfill
     \ifdefempty{\tfe@curso}{%
-      \ClassWarning{fdi-memoria}{Falta \string\cursoAcademico{...}}%
+      \ClassWarning{fdi-simplex}{Falta \string\cursoAcademico{...}}%
     }{{Curso académico \tfe@curso\par}}%
     \tfe@portadaFinal
   \end{titlepage}

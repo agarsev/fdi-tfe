@@ -1,4 +1,4 @@
-# fdi-memoria — Plantilla LaTeX para TFG/TFM
+# fdi-simplex — Plantilla LaTeX para TFG/TFM
 
 Plantilla LaTeX para la memoria del Trabajo de Fin de Grado (TFG) o de
 Máster (TFM) de la Facultad de Informática de la Universidad Complutense
@@ -8,14 +8,14 @@ de Madrid.
 
 | Archivo | Descripción |
 |---|---|
-| `fdi-memoria.cls` | Clase LaTeX. Copiar junto al `.tex` principal. |
+| `fdi-simplex.cls` | Clase LaTeX. Copiar junto al `.tex` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto al `.tex` principal. |
 | `ejemplo/` | Documentos de ejemplo compilables (`tfg.tex`, `tfm.tex`). |
 
 ## Uso rápido
 
 ```latex
-\documentclass[tfg]{fdi-memoria}   % tfg o tfm
+\documentclass[tfg]{fdi-simplex}   % tfg o tfm
 
 \titulo{Título del trabajo}
 \tituloEN{Work title in English}
@@ -73,8 +73,8 @@ El estilo por defecto es `authoryear` (citas autor-año, p. ej. «García, 2023�
 Para usar otro estilo, pásalo como opción de clase:
 
 ```latex
-\documentclass[tfg, estilobib=numeric]{fdi-memoria}   % citas numéricas [1]
-\documentclass[tfg, estilobib=alphabetic]{fdi-memoria} % citas alfabéticas [Gar23]
+\documentclass[tfg, estilobib=numeric]{fdi-simplex}   % citas numéricas [1]
+\documentclass[tfg, estilobib=alphabetic]{fdi-simplex} % citas alfabéticas [Gar23]
 ```
 
 Los estilos disponibles son los de biblatex; consúltese la

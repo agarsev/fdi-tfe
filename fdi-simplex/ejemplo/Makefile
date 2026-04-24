@@ -13,7 +13,7 @@ all: $(DOCS)
 %.pdf: $(BUILDDIR)/%.pdf
 	cp $< $@
 
-$(BUILDDIR)/%.pdf: %.tex ../fdi-memoria.cls ../Escudo_UCM.png $(wildcard capitulos/*) | $(BUILDDIR)
+$(BUILDDIR)/%.pdf: %.tex ../fdi-simplex.cls ../Escudo_UCM.png $(wildcard capitulos/*) | $(BUILDDIR)
 	$(LATEX) $(FLAGS) -output-directory=$(BUILDDIR) $<
 	$(BIBER) $(BUILDDIR)/$*
 	$(LATEX) $(FLAGS) -output-directory=$(BUILDDIR) $<
