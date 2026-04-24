@@ -29,19 +29,26 @@
 %%
 %% Opciones de clase:
 %%   tfg | tfm               Tipo de documento (defecto: tfg)
-%%   estilo=minimo|texis     Estilo del cuerpo (defecto: minimo)
-%%   portada=normativa|texis Estilo de la portada (defecto: normativa).
+%%   estilo=digital|minimo|clasico
+%%                           Estilo del cuerpo (defecto: digital)
+%%   portada=normativa|elegante
+%%                           Estilo de la portada (defecto: normativa).
 %%                           Es ortogonal a `estilo`: puede combinarse
 %%                           cualquier portada con cualquier estilo.
 %%   idioma=es|en            Idioma principal (defecto: es)
 %%   estilobib=<style>       Estilo biblatex (defecto: authoryear)
 %%                           Otros valores habituales: numeric, alphabetic.
 %%                           Véase https://biblatex-biber.sourceforge.net/
+%%   colorenlace=<color>     Color de enlaces, citas y URLs (defecto:
+%%                           fdiLink, un azul marino sobrio). Sólo aplica
+%%                           al estilo `digital'. El nombre debe ser un
+%%                           color definido (built-in de xcolor o vía
+%%                           \definecolor en el preámbulo).
 %%   cualquier otra opción se pasa a scrbook.
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fdi-simplex}[2026/04/17 v0.2 Plantilla TFG/TFM Facultad de Informática UCM]
+\ProvidesClass{fdi-simplex}[2026/04/24 v0.2 Plantilla TFG/TFM Facultad de Informática UCM]
 
 %%----------------------------------------------------------------------
 %% 1. Opciones de clase
@@ -51,10 +58,11 @@
 
 \DeclareBoolOption[true]{tfg}
 \DeclareBoolOption{tfm}
-\DeclareStringOption[minimo]{estilo}
+\DeclareStringOption[digital]{estilo}
 \DeclareStringOption[normativa]{portada}
 \DeclareStringOption[es]{idioma}
 \DeclareStringOption[authoryear]{estilobib}
+\DeclareStringOption[fdiLink]{colorenlace}
 
 \DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{scrbook}}
 \ProcessKeyvalOptions*\relax
@@ -66,7 +74,7 @@
 %% 2. Clase base: scrbook (KOMA-Script). Usamos scrbook en lugar de
 %%    scrreport para disponer de \frontmatter/\mainmatter/\backmatter.
 %%    Por defecto forzamos oneside para un aspecto digital; el estilo
-%%    texis reactiva twoside más abajo. parskip=half- da media línea
+%%    clasico reactiva twoside más abajo. parskip=half- da media línea
 %%    entre párrafos sin sangría; DIV=12 da márgenes generosos.
 %%----------------------------------------------------------------------
 \LoadClass[11pt, a4paper, oneside, DIV=12, parskip=half-, numbers=noenddot]{scrbook}
@@ -101,6 +109,10 @@
 \RequirePackage{xcolor}
 \RequirePackage{csquotes}
 
+% Color por defecto de enlaces.
+\definecolor{fdiLink}{HTML}{00559e}
+
+
 %%----------------------------------------------------------------------
 %% 4. Almacén de metadatos
 %%----------------------------------------------------------------------
@@ -120,14 +132,14 @@
 \newcounter{tfe@nautores}
 \newcommand{\autor}[1]{%
   \stepcounter{tfe@nautores}%
-  \expandafter\def\csname tfe@autor@\the\value{tfe@nautores}\endcsname{#1}%
-  \ifx\tfe@autores\@empty
+  \csdef{tfe@autor@\the\value{tfe@nautores}}{#1}%
+  \ifdefempty{\tfe@autores}{%
     \def\tfe@autores{#1}%
     \def\tfe@autoresPlain{#1}%
-  \else
-    \expandafter\def\expandafter\tfe@autores\expandafter{\tfe@autores\\#1}%
-    \expandafter\def\expandafter\tfe@autoresPlain\expandafter{\tfe@autoresPlain, #1}%
-  \fi
+  }{%
+    \appto\tfe@autores{\\#1}%
+    \appto\tfe@autoresPlain{, #1}%
+  }%
   \def\@author{\tfe@autoresPlain}%
 }
 
@@ -162,7 +174,7 @@
 \newcounter{tfe@ical}   % contador de iteración para portadaFinal
 \newcommand{\calificacion}[1]{%
   \stepcounter{tfe@ncalificaciones}%
-  \expandafter\def\csname tfe@cal@\the\value{tfe@ncalificaciones}\endcsname{#1}%
+  \csdef{tfe@cal@\the\value{tfe@ncalificaciones}}{#1}%
 }
 
 % Palabras clave
@@ -222,17 +234,15 @@
 \def\tfe@logo{Escudo_UCM}
 
 %%----------------------------------------------------------------------
-%% 5. Portada normativa
+%% 5. Portadas
 %%
-%% Contiene la información obligatoria exigida por la normativa:
+%% Contienen la información obligatoria exigida por la normativa:
 %% - Título (castellano e inglés)
 %% - Autor(es)
 %% - Director/Tutor (+ codirector/cotutor/colaborador externo)
 %% - "Tipo en Titulación, Facultad de Informática, UCM"
 %% - Curso académico
 %% - Convocatoria y calificación si se han definido (versión final)
-%%
-%% El aspecto visual varía ligeramente según la opción `estilo`.
 %%----------------------------------------------------------------------
 
 \newcommand{\tfe@portadaEscudo}{%
@@ -289,15 +299,13 @@
       }{}%
     }{}%
     \ifnumequal{\value{tfe@ncalificaciones}}{1}{%
-      \tfe@text@calificacion: \csname tfe@cal@1\endcsname\par
+      \tfe@text@calificacion: \csuse{tfe@cal@1}\par
     }{%
       \setcounter{tfe@ical}{0}%
-      \loop
+      \whileboolexpr{test {\ifnumless{\value{tfe@ical}}{\value{tfe@ncalificaciones}}}}{%
         \stepcounter{tfe@ical}%
-        \csname tfe@autor@\the\value{tfe@ical}\endcsname~---~%
-        \csname tfe@cal@\the\value{tfe@ical}\endcsname\par
-      \ifnum\value{tfe@ical}<\value{tfe@ncalificaciones}%
-      \repeat
+        \csuse{tfe@autor@\the\value{tfe@ical}}~---~\csuse{tfe@cal@\the\value{tfe@ical}}\par
+      }%
     }%
   }%
 }
@@ -306,13 +314,22 @@
 % exige la normativa de la FDI, sin decoraciones.
 \newcommand{\tfe@portadaNormativa}{%
   \begin{titlepage}
+    % Sin destinos page.* en la portada: evita colisión con page.1/2
+    % cuando \mainmatter (o \frontmatter en twoside) reinicia el contador.
+    \hypersetup{pageanchor=false}%
     \centering
     \tfe@portadaEscudo\par
     \vspace{1.2cm}
     {\large \tfe@portadaRotulo \par}
     \vfill
-    {\huge\bfseries \@title \par}%
-    \ifdefempty{\@tituloEN}{}{\vspace{0.6em}{\Large\itshape \@tituloEN \par}}%
+    % El título va en un bloque algo más estrecho que la caja de texto
+    % para que los títulos largos partan en varias líneas legibles en
+    % lugar de ocupar toda la anchura de la página.
+    {\huge\bfseries
+      \begin{minipage}{0.82\textwidth}\centering \@title \par\end{minipage}\par}%
+    \ifdefempty{\@tituloEN}{}{\vspace{1.2em}%
+      {\Large\itshape
+        \begin{minipage}{0.82\textwidth}\centering \@tituloEN \par\end{minipage}\par}}%
     \vfill
     {\large \tfe@autores \par}
     \vspace{0.8cm}
@@ -328,13 +345,14 @@
 % Portada reminiscente de TeXiS: título flanqueado por reglas, tipo de
 % documento en versalitas justo debajo del escudo, bloques separados
 % por \vfill. Sigue cumpliendo la normativa (mismos campos).
-\newcommand{\tfe@portadaTeXiS}{%
+\newcommand{\tfe@portadaElegante}{%
   \begin{titlepage}
+    \hypersetup{pageanchor=false}%
     \centering
     \mbox{}\vfill
     \rule{0.75\textwidth}{0.5mm}\\[0.8em]
     {\huge\bfseries \@title \par}%
-    \ifdefempty{\@tituloEN}{}{\vspace{0.5em}{\Large\itshape \@tituloEN \par}}%
+    \ifdefempty{\@tituloEN}{}{\vspace{1em}{\Large\itshape \@tituloEN \par}}%
     \vspace{0.8em}\rule{0.75\textwidth}{0.5mm}%
     \vfill
     \tfe@portadaEscudo\par
@@ -356,42 +374,74 @@
 
 % Dispatcher: elige la portada según la opción `portada`.
 \newcommand{\makeportada}{%
-  \ifdefstring{\tfe@portada}{texis}{\tfe@portadaTeXiS}{%
+  \ifdefstring{\tfe@portada}{elegante}{\tfe@portadaElegante}{%
   \ifdefstring{\tfe@portada}{normativa}{\tfe@portadaNormativa}{%
     \ClassError{fdi-simplex}{%
       Opción `portada=\tfe@portada' desconocida.%
-    }{Valores válidos: normativa, texis.}%
+    }{Valores válidos: normativa, elegante.}%
   }}%
 }
 \let\maketitle\makeportada
 
 %%----------------------------------------------------------------------
-%% 6. Resumen / Abstract y palabras clave
+%% 6. Resumen / Abstract, palabras clave y contribuciones
 %%
 %% Normativa exige ambos: en castellano y en inglés, cada uno con su
 %% lista de ≤ 10 palabras clave. Los implementamos como capítulos sin
 %% numerar, incluidos en el TOC.
 %%----------------------------------------------------------------------
 
+% Margen extra lateral para resumen, abstract y contribuciones.
+% El estilo `digital` lo reduce a 1cm (sutil); otros estilos lo dejan en 0pt.
+\newlength{\tfe@marginextra}
+\setlength{\tfe@marginextra}{0pt}
+
+% Encabezado común para resumen, abstract y contribución: centrado,
+% sin regla horizontal, con un tamaño menor que un título de capítulo
+% normal.
+\newcommand{\tfe@abschead}[1]{%
+  \cleardoublepage
+  \thispagestyle{plain}%
+  \phantomsection
+  \addcontentsline{toc}{chapter}{#1}%
+  \markboth{#1}{#1}%
+  \vspace*{2em}%
+  \begin{center}%
+    {\usekomafont{disposition}\LARGE #1\par}%
+  \end{center}%
+  \vspace{1.5em}%
+}
+
 \newenvironment{resumen}{%
-  \chapter*{Resumen}%
-  \addcontentsline{toc}{chapter}{Resumen}%
+  \tfe@abschead{Resumen}%
+  \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
 }{%
   \ifdefempty{\tfe@palabrasClave}{}{%
     \par\medskip\noindent\textbf{Palabras clave:} \tfe@palabrasClave\par
   }%
+  \end{addmargin}%
 }
 
 % scrbook no define `abstract` (a diferencia de scrreport). Lo creamos
 % como capítulo bilingüe paralelo a `resumen`.
 \newenvironment{abstract}{%
-  \chapter*{Abstract}%
-  \addcontentsline{toc}{chapter}{Abstract}%
+  \tfe@abschead{Abstract}%
+  \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
   \ifdefempty{\@tituloEN}{}{\noindent\textit{\@tituloEN}\par\medskip}%
 }{%
   \ifdefempty{\tfe@keywords}{}{%
     \par\medskip\noindent\textbf{Keywords:} \tfe@keywords\par
   }%
+  \end{addmargin}%
+}
+
+% Contribución personal (TFG en grupo: normativa exige al menos 2 páginas
+% por autor describiendo su aportación individual al proyecto).
+\newenvironment{contribucion}[1]{%
+  \tfe@abschead{Contribución de #1}%
+  \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
+}{%
+  \end{addmargin}%
 }
 
 %%----------------------------------------------------------------------
@@ -399,16 +449,149 @@
 %%
 %% Los estilos son deliberadamente pequeños: un par de ajustes
 %% tipográficos, no una hoja de estilo completa.
+%%
+%% Punto de extensión para hyperref: un estilo puede redefinirlo para
+%% cambiar cómo se carga hyperref (p. ej. con `colorlinks`). Se carga
+%% luego desde \AtEndPreamble (sección 10).
 %%----------------------------------------------------------------------
+\newcommand{\tfe@hyperrefSetup}{%
+  \RequirePackage[pdfusetitle, hidelinks, pdfdisplaydoctitle]{hyperref}%
+}
 
-% Definimos los comandos de marca aquí fuera porque dentro del cuerpo de
-% \ifdefstring el carácter # requiere un escapado incómodo (##).
-\newcommand{\tfe@chaptermarkTeXiS}[1]{%
+% Formato de título de capítulo para el estilo digital: cuelga el número
+% y añade una regla horizontal fina pegada debajo del título. Definidos
+% fuera del bloque \ifdefstring porque \newcommand con # da problemas
+% dentro del argumento de \ifdefstring.
+\newcommand{\tfe@chapterlinesDigital}[3]{%
+  \@hangfrom{#2}{#3}%
+  \par\nobreak\vskip-0.6ex\rule{\linewidth}{0.5pt}%
+}
+
+% Comandos de marca para el estilo clasico; ídem.
+\newcommand{\tfe@chaptermarkClasico}[1]{%
   \markboth{\textsc{\chaptername\ \thechapter.}\ #1}{}%
 }
-\newcommand{\tfe@sectionmarkTeXiS}[1]{\markright{\thesection.\ #1}}
+\newcommand{\tfe@sectionmarkClasico}[1]{\markright{\thesection.\ #1}}
 
-\ifdefstring{\tfe@estilo}{texis}{%
+\ifdefstring{\tfe@estilo}{digital}{%
+  % Estilo digital (defecto): Lora serif en cuerpo y títulos (SemiBold
+  % para encabezados), interlineado onehalf con sangría de párrafo,
+  % cabecera limpia con el título de capítulo/sección, número de página
+  % centrado al pie en todas las páginas. Enlaces coloreados (sin
+  % bordes ni subrayados).
+
+  % Fuente: Lora. Si no está instalada, avisamos fuerte para que el
+  % estudiante lo sepa (nada de fallback silencioso). Usamos la versión
+  % variable del archivo para poder pedir un peso SemiBold (600) para
+  % los encabezados y Bold (700) para el \textbf normal.
+  \IfFontExistsTF{Lora}{%
+    \setmainfont{Lora}[%
+      Ligatures=TeX,
+      BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
+      ItalicFont={Lora}, ItalicFeatures={RawFeature={axis={wght=400}}},
+      BoldItalicFont={Lora}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
+    ]%
+    \newfontfamily\tfe@dispfont{Lora}[%
+      Ligatures=TeX,
+      UprightFeatures={RawFeature={axis={wght=600}}},
+      BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
+    ]%
+    \setkomafont{disposition}{\normalcolor\tfe@dispfont}%
+    % Variante para URLs: ligeramente más pesada que el cuerpo (semibold).
+    \newfontfamily\tfe@urlfont{Lora}[%
+      Ligatures=TeX,
+      UprightFeatures={RawFeature={axis={wght=500}}},
+    ]%
+  }{%
+    \ClassWarningNoLine{fdi-simplex}{%
+      La fuente Lora no se ha encontrado.\MessageBreak
+      Instalala desde https://fonts.google.com/specimen/Lora, o\MessageBreak
+      cambia la fuente con \protect\setmainfont{...} en tu preambulo%
+    }%
+    \addtokomafont{disposition}{\rmfamily}%
+  }%
+
+  % Monoespaciada: IBM Plex Mono. Aviso fuerte si no está instalada.
+  \IfFontExistsTF{IBM Plex Mono}{%
+    \setmonofont{IBM Plex Mono}[Scale=MatchLowercase]%
+  }{%
+    \ClassWarningNoLine{fdi-simplex}{%
+      La fuente IBM Plex Mono no se ha encontrado.\MessageBreak
+      Instalala desde https://fonts.google.com/specimen/IBM+Plex+Mono, o\MessageBreak
+      cambia la fuente con \protect\setmonofont{...} en tu preambulo%
+    }%
+  }%
+
+  % Interlineado onehalf y sangría tradicional de párrafo en vez del
+  % espacio entre párrafos que trae KOMA por defecto (parskip=half-).
+  \KOMAoptions{parskip=false}%
+  \linespread{1.25}%
+  \setlength{\parindent}{1em}%
+  \setlength{\parskip}{0.2\baselineskip}%
+
+  % 1cm extra de margen superior en las páginas del cuerpo (la titlepage
+  % usa su propio layout y no se ve afectada). Reducimos textheight en
+  % la misma cantidad para preservar el margen inferior.
+  \addtolength{\topmargin}{1cm}%
+  \addtolength{\textheight}{-1cm}%
+
+  % scrlayer-scrpage: cabecera con el título del capítulo o sección,
+  % número de página centrado al pie. El `*' en \cfoot* mantiene el
+  % número también en la apertura de capítulo (pagestyle plain).
+  \RequirePackage[automark, headsepline]{scrlayer-scrpage}%
+  \clearpairofpagestyles%
+  \ihead{\headmark}%
+  \cfoot*{\pagemark}%
+  \setkomafont{pageheadfoot}{\normalfont\small}%
+  \setkomafont{pagenumber}{\normalfont\small}%
+
+  % Número de capítulo con punto explícito.
+  \renewcommand*\chapterformat{%
+    \chapappifchapterprefix{\nobreakspace}%
+    \thechapter.\enskip
+  }%
+  % Punto también en las marcas de cabecera.
+  \renewcommand*{\chaptermarkformat}{\thechapter.\enskip}%
+  \renewcommand*{\sectionmarkformat}{\thesection.\enskip}%
+  % Regla pegada bajo el título de capítulo.
+  \let\chapterlinesformat\tfe@chapterlinesDigital
+
+  % Resumen, abstract y contribución ligeramente más estrechos que el
+  % texto normal.
+  \setlength{\tfe@marginextra}{1cm}%
+
+  % ulem para subrayar URLs. `normalem' preserva \emph como cursiva.
+  \RequirePackage[normalem]{ulem}%
+
+  % Hyperref con colorlinks (sin bordes ni subrayados):
+  %  - Referencias cruzadas, citas y URLs: en color \tfe@colorenlace
+  %    (configurable con la opción de clase `colorenlace=<color>').
+  %  - URLs (\url y destinos de \href): subrayadas y en peso semibold.
+  %  - TOC: sin decoración (se asume que las entradas son pinchables).
+  \renewcommand{\tfe@hyperrefSetup}{%
+    \RequirePackage[pdfusetitle, pdfdisplaydoctitle,
+      colorlinks=true,
+      linkcolor=\tfe@colorenlace,
+      citecolor=\tfe@colorenlace,
+      urlcolor=\tfe@colorenlace]{hyperref}%
+    % URLs en la fuente del cuerpo, peso semibold y subrayadas. Patcheamos
+    % \hyper@linkurl (afecta a \url y a \href con destino URL) para envolver
+    % el texto mostrado en \uline.
+    \urlstyle{same}%
+    \@ifundefined{tfe@urlfont}{}{\renewcommand{\UrlFont}{\tfe@urlfont}}%
+    \let\tfe@orig@hyper@linkurl\hyper@linkurl
+    % \ULdepth por defecto (\maxdimen) hace que ulem auto-detecte el
+    % descender y la regla quede muy por debajo de las letras (parece
+    % una caja). Lo fijamos para que el subrayado quede pegado al texto.
+    \def\hyper@linkurl##1##2{%
+      \tfe@orig@hyper@linkurl{{\setlength{\ULdepth}{1.8pt}\uline{##1}}}{##2}}%
+    % TOC sin decoración de links (restablece al salir del grupo).
+    \let\tfe@origtoc\tableofcontents
+    \renewcommand{\tableofcontents}{%
+      \begingroup\hypersetup{hidelinks}\tfe@origtoc\endgroup}%
+  }%
+}{%
+\ifdefstring{\tfe@estilo}{clasico}{%
   % Estilo reminiscente de TeXiS. Replica los rasgos visuales más
   % característicos de la plantilla clásica sin cambiar la clase base.
 
@@ -429,44 +612,51 @@
 
   % Cabeceras estilo TeXiS: regla fina, capítulo en versalitas en páginas
   % pares, sección en impares, número de página en el borde exterior.
-  \RequirePackage{fancyhdr}%
-  \pagestyle{fancy}%
-  \fancyhf{}%
-  \renewcommand{\headrulewidth}{0.2pt}%
-  \renewcommand{\footrulewidth}{0pt}%
-  \addtolength{\headheight}{2pt}%
-  \let\chaptermark\tfe@chaptermarkTeXiS
-  \let\sectionmark\tfe@sectionmarkTeXiS
-  \fancyhead[LO]{\rightmark}%
-  \fancyhead[RE]{\leftmark}%
-  \fancyhead[RO,LE]{\thepage}%
-  % Primera página de capítulo: sin regla superior, nº al pie borde exterior.
-  \fancypagestyle{plain}{%
-    \fancyhf{}%
-    \fancyfoot[RO,LE]{\thepage}%
-    \renewcommand{\headrulewidth}{0pt}%
-    \renewcommand{\footrulewidth}{0pt}%
-  }%
+  % En aperturas de capítulo (pagestyle plain) se omite la cabecera y el
+  % número de página baja al pie exterior.
+  \RequirePackage[headsepline=0.2pt]{scrlayer-scrpage}%
+  \pagestyle{scrheadings}%
+  \clearpairofpagestyles%
+  \let\chaptermark\tfe@chaptermarkClasico
+  \let\sectionmark\tfe@sectionmarkClasico
+  \ihead[]{\headmark}%
+  \ohead[]{\pagemark}%
+  \ofoot[\pagemark]{}%
 }{%
-  % minimo: defaults de KOMA (parskip=half-, sin sangría, titulares sans)
-}
+\ifdefstring{\tfe@estilo}{minimo}{%
+  % minimo: KOMA puro, sin customización adicional.
+}{%
+  \ClassError{fdi-simplex}{%
+    Opción `estilo=\tfe@estilo' desconocida.%
+  }{Valores válidos: digital, minimo, clasico.}%
+}}}
 
 %%----------------------------------------------------------------------
-%% 9. Bibliografía: biblatex con backend biber
+%% 8. Bibliografía: biblatex con backend biber
 %%----------------------------------------------------------------------
 \RequirePackage[backend=biber, style=\tfe@estilobib]{biblatex}
 
-%%----------------------------------------------------------------------
-%% 10. hyperref al final del preámbulo (debe ir el último)
-%%
-%% La carga de hyperref se extrae a \tfe@hyperrefSetup para que un estilo
-%% pueda redefinirla (p. ej. `colorlinks` con paleta propia en el estilo
-%% "moderno"). Por defecto: sin color, enlaces ocultos.
-%%----------------------------------------------------------------------
-\newcommand{\tfe@hyperrefSetup}{%
-  \RequirePackage[pdfusetitle, hidelinks, pdfdisplaydoctitle]{hyperref}%
-}
+% Con authoryear, la cita por defecto es «Autor Año». Envolvemos el año
+% entre paréntesis para dar la forma habitual «Autor (Año)». Mantenemos
+% el `bibhyperref` para que la referencia siga siendo pinchable.
+\ifdefstring{\tfe@estilobib}{authoryear}{%
+  \renewbibmacro*{cite:labeldate+extradate}{%
+    \iffieldundef{labelyear}%
+      {}%
+      {\printtext[bibhyperref]{\printtext[parens]{\printlabeldateextra}}}%
+  }%
+}{}
 
+% Damos un poco más de aire entre las entradas
+% de la bibliografía, que en authoryear quedan demasiado apretadas.
+\setlength{\bibitemsep}{0.6em plus 0.1em}%
+
+%%----------------------------------------------------------------------
+%% 9. hyperref al final del preámbulo (debe ir el último)
+%%
+%% \tfe@hyperrefSetup se define en la sección 7 para que los estilos
+%% puedan redefinirlo. Aquí sólo lo invocamos en \AtEndPreamble.
+%%----------------------------------------------------------------------
 \AtEndPreamble{%
   \tfe@hyperrefSetup
   \AtBeginDocument{%

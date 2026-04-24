@@ -63,7 +63,7 @@ lualatex memoria.tex
 | Opción | Valores | Defecto | Descripción |
 |---|---|---|---|
 | *(primera)* | `tfg` \| `tfm` | `tfg` | Tipo de documento |
-| `estilo` | `minimo` \| `texis` | `minimo` | Estilo del cuerpo del documento |
+| `estilo` | `moderno` \| `minimo` \| `texis` | `moderno` | Estilo del cuerpo del documento |
 | `portada` | `normativa` \| `texis` | `normativa` | Estilo de la portada |
 | `idioma` | `es` \| `en` | `es` | Idioma principal |
 | `estilobib` | cualquier estilo biblatex | `authoryear` | Estilo bibliográfico |
@@ -74,13 +74,19 @@ lualatex memoria.tex
 combinación es válida. Ejemplos:
 
 ```latex
-\documentclass[tfg]{fdi-simplex}                              % minimo + normativa
+\documentclass[tfg]{fdi-simplex}                              % moderno + normativa
 \documentclass[tfm, estilo=texis, portada=texis]{fdi-simplex} % clásico TeXiS
-\documentclass[tfg, portada=texis]{fdi-simplex}               % cuerpo sobrio, portada clásica
+\documentclass[tfg, estilo=minimo]{fdi-simplex}               % KOMA puro, sin acentos
 ```
 
-- `estilo=minimo` — defaults de KOMA: oneside, sans-serif en títulos,
-  cabeceras limpias.
+- `estilo=moderno` — aspecto digital: serif Lora (SemiBold en títulos),
+  interlineado onehalf con sangría de párrafo, oneside, cabecera con
+  el nombre del capítulo y regla fina bajo el título, número de página
+  al pie en todas las páginas. Referencias cruzadas y citas subrayadas
+  en granate UCM; URLs en color granate con prefijo 🔗.
+  Requiere la fuente [Lora](https://fonts.google.com/specimen/Lora)
+  (variable); si no está, la plantilla avisa.
+- `estilo=minimo` — defaults de KOMA sin acento ni enlaces coloreados.
 - `estilo=texis` — twoside, serif, cabeceras con regla y versalitas
   (reminiscente de la plantilla TeXiS).
 - `portada=normativa` — portada limpia con los campos de la normativa.

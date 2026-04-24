@@ -1,4 +1,4 @@
-\documentclass[tfg, estilo=minimo]{fdi-simplex}
+\documentclass[tfg,estilo=digital,portada=normativa]{fdi-simplex}
 
 \titulo{Un sistema para ilustrar la plantilla fdi-simplex}
 \tituloEN{A system to showcase the fdi-simplex template}
@@ -17,6 +17,9 @@
 \keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty}
 
 \usepackage{lipsum}
+
+% Para cambiar la fuente principal (solo LuaLaTeX/XeLaTeX), añade esta línea:
+% \setmainfont{TeX Gyre Pagella}   % o cualquier otra fuente OpenType instalada
 
 \addbibresource{bibliografia.bib}
 
@@ -62,17 +65,15 @@ keyword environments, and biblatex integration.
 
 % Normativa V.5: en trabajos en grupo cada autor debe incluir al menos
 % dos páginas describiendo su contribución personal al proyecto.
-\chapter*{Contribución de Ana García López}
-\addcontentsline{toc}{chapter}{Contribución de Ana García López}
-
+\begin{contribucion}{Ana García López}
 Descripción de las tareas asumidas por Ana: diseño de la arquitectura,
 implementación del módulo X, redacción de los capítulos Y y Z\ldots
+\end{contribucion}
 
-\chapter*{Contribución de Bruno Martín Ruiz}
-\addcontentsline{toc}{chapter}{Contribución de Bruno Martín Ruiz}
-
+\begin{contribucion}{Bruno Martín Ruiz}
 Descripción de las tareas asumidas por Bruno: integración con el sistema
 externo, batería de pruebas, redacción de los capítulos W y V\ldots
+\end{contribucion}
 
 \printbibliography[heading=bibintoc]
 
