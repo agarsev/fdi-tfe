@@ -1,36 +1,41 @@
 \documentclass[tfg,estilo=digital,portada=normativa]{fdi-simplex}
+% Cambiar arriba tfg por tfm en su caso
 
 \titulo{Un sistema para ilustrar la plantilla fdi-simplex}
 \tituloEN{A system to showcase the fdi-simplex template}
-\autor{Ana García López}
-% \calificacion{Notable (8)}
-\autor{Bruno Martín Ruiz}
-% \calificacion{Sobresaliente (10)}
-\director{Prof. Carmen Díaz}
-\codirector{Prof. Diego Romero}
-\titulacion{Ingeniería Informática}
-\cursoAcademico{2024/2025}
-% Versión final: una calificación por autor (en el mismo orden que \autor).
-% Para versión de entrega, comentar las dos líneas siguientes.
+\autor{Frodo Bolsón}
+% \calificacion{Notable (8)}           % Poner en la versión final
+\autor{Samsagaz Gamyi}
+% \calificacion{Sobresaliente (10)}    % Poner en la versión final
+\director{Gandalf el Gris}
+% \director{Elrond Medio-elfo}         % Se puede repetir
+% \codirector{Elrond Medio-elfo}       % O también poner así
+% \tutor{Arwen Tinuviel}               % En TFM tutor y cotutor
+
+\titulacion{Ingeniería y esas cosas}
+\cursoAcademico{2098/2099}
 
 \palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática}
 \keywords{LaTeX, template, bachelor's thesis, Computer Science Faculty}
 
-\usepackage{lipsum}
-
-% Para cambiar la fuente principal (solo LuaLaTeX/XeLaTeX), añade esta línea:
-% \setmainfont{TeX Gyre Pagella}   % o cualquier otra fuente OpenType instalada
-
 \addbibresource{bibliografia.bib}
+
+% - OPCIONES DE PERSONALIZACION -
+
+% Usar si se guarda el escudo en otra ubicación
+%\logo{img/Escudo_UCM}
+
+% Para cambiar las fuente tipográficas (solo LuaLaTeX/XeLaTeX)
+%\setmainfont{Source Serif 4}
+%\setmonofont{Source Code Pro}
 
 \begin{document}
 
+% Se puede cambiar el estilo de la portada con la opción
+% portada=normativa|elegante en el documentclass, o se puede diseñar una propia
+% (simplemente no llamar a este comando)
 \makeportada
 
-% \frontmatter / \mainmatter / \backmatter vienen de scrbook. No son
-% obligatorios: si los quitas, las páginas se numeran en arábigos corridos
-% desde el principio. Con \frontmatter se numeran en romanos hasta la
-% primera llamada a \mainmatter.
 \frontmatter
 
 \begin{resumen}
@@ -42,6 +47,7 @@ resumen y palabras clave, e integración con biblatex.
 \palabrasClave{LaTeX, plantilla, TFG, Facultad de Informática, Universidad Complutense de Madrid}
 \end{resumen}
 
+% En TFM, según la normativa punto 6 el resumen en inglés va primero, cambiar
 \begin{abstract}
 This document demonstrates the \texttt{fdi-simplex} template for
 writing the report of a Bachelor's Thesis at the Faculty of
@@ -58,21 +64,35 @@ keyword environments, and biblatex integration.
 \input{capitulos/introduccion}
 \input{capitulos/desarrollo}
 \input{capitulos/conclusiones}
-% Normativa V.4 (TFG): se requieren conclusiones en inglés.
+% Normativa (TFG, V.4): se requieren conclusiones en inglés.
 \input{capitulos/conclusiones-en}
 
 \backmatter
 
-% Normativa V.5: en trabajos en grupo cada autor debe incluir al menos
+% Normativa (TFG, V.5): en trabajos en grupo cada autor debe incluir al menos
 % dos páginas describiendo su contribución personal al proyecto.
-\begin{contribucion}{Ana García López}
-Descripción de las tareas asumidas por Ana: diseño de la arquitectura,
-implementación del módulo X, redacción de los capítulos Y y Z\ldots
+\begin{contribucion}{Frodo Bolsón}
+\begin{itemize}
+\item Aceptar la carga del Anillo
+\item Viaje a Rivendel
+\item Liderar la Comunidad del Anillo
+\item Continuar hacia Mordor en solitario
+\item Navegar por terrenios hostiles
+\item Resistir la influencia del Anillo
+\item Alcanzar la Montaña de la Perdición
+\item La Purga de la Comarca
+\end{itemize}
 \end{contribucion}
 
-\begin{contribucion}{Bruno Martín Ruiz}
-Descripción de las tareas asumidas por Bruno: integración con el sistema
-externo, batería de pruebas, redacción de los capítulos W y V\ldots
+\begin{contribucion}{Samsagaz Gamyi}
+\begin{itemize}
+\item Unirse a la misión de Frodo en la Comarca
+\item Cuidar de Frodo durante el viaje
+\item Rescatar a Frodo de la telaraña de Ella-Laraña
+\item Salvar a Frodo de la Torre de Cirith Ungol
+\item Ayudar a Frodo a escalar la Montaña de la Perdición
+\item Participar en la Purga de la Comarca
+\end{itemize}
 \end{contribucion}
 
 \printbibliography[heading=bibintoc]

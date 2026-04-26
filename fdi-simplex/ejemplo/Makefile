@@ -1,4 +1,4 @@
-DOCS     = tfg.pdf tfm.pdf
+DOCS     = tfg.pdf
 LATEX    = lualatex
 BIBER    = biber
 FLAGS    = -interaction=nonstopmode -halt-on-error

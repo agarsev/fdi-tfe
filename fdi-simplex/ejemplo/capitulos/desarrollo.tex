@@ -2,8 +2,14 @@
 
 El cuerpo principal de la memoria describe el trabajo realizado.
 En este ejemplo, demostramos algunas construcciones típicas: una
-cita bibliográfica~\cite{knuth1986}, referencias cruzadas a la
-sección~\ref{sec:arquitectura}, y una figura.
+cita bibliográfica~\cite{knuth1986} y referencias cruzadas a la
+sección~\ref{sec:arquitectura}.
+
+Decía a menudo que solo había un camino y que era como un río caudaloso; nacía
+en el umbral de todas las puertas, y todos los senderos eran ríos tributarios.
+"Es muy peligroso, Frodo, cruzar la puerta", solía decirme. "Vas hacia el
+Camino, y si no cuidas tus pasos no sabes hacia donde te arrastrarán"»
+\autocite{tolkien1954lord}.
 
 \section{Arquitectura}
 \label{sec:arquitectura}
@@ -16,7 +22,5 @@ visual concreto queda delegado a la opción \texttt{estilo}.
 \section{Implementación}
 
 La implementación se basa en la clase KOMA-Script
-\texttt{scrbook}, con soporte nativo para UTF-8 mediante
+\texttt{scrbook} \autocite{kohm2004koma}, con soporte nativo para UTF-8 mediante
 LuaLaTeX.
-
-\lipsum[4-8]

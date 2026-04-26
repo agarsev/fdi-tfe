@@ -1,28 +1,41 @@
 \chapter{Introduction}
 
 This chapter presents the background, objectives, and work plan of
-the report, as required by the Faculty of Computer Science regulations
+the report, as required by the regulations for the final-year
+project of the Faculty of Computer Science
 (\href{https://informatica.ucm.es/normativa-tfm-2425}{informatica.ucm.es/normativa-tfm-2425}).
+
+\section{Regulations}
+
+\begin{itemize}\setlength{\itemsep}{0pt}
+  \item Minimum length: 25 pages for a single-author Bachelor's
+        thesis (plus 5 per additional co-author); 50 pages for a
+        Master's thesis.
+  \item At most 10 keywords in each language.
+  \item The English abstract of the Master's thesis must be
+        approximately half a page long.
+  \item All non-original material (text, figures, code) must be
+        cited and respect its license.
+  \item \textbf{Master's thesis only}: the student must sign and
+        attach the \emph{responsible declaration on authorship and
+        ethical use of artificial intelligence tools}.
+\end{itemize}
 
 \section{Background}
 
 The Faculty of Computer Science at UCM has used the TeXiS~\cite{texis}
-template for theses and final-year projects for over a decade. Over
-time, the evolution of the \LaTeX{} ecosystem has left some of its
-technical decisions outdated.
+system for over a decade for its thesis reports and final-year
+projects. This shell helps prepare complex documents with good
+practices, but being a shell rather than a template, it is more
+difficult to integrate with other systems, and it does not
+encourage users to learn LaTeX.
 
 \section{Objectives}
 
 The objectives of this work are:
 \begin{itemize}
-  \item Provide a modern template based on Lua\LaTeX.
+  \item Provide a modern template based on LuaLaTeX.
   \item Separate normative aspects from aesthetic ones.
   \item Offer a minimal base that does not interfere with the
         packages each student chooses to use.
 \end{itemize}
-
-\section{Work Plan}
-
-The plan covers the development of the class, the minimal and texis
-styles, compilable examples, and verification against the current
-regulations.

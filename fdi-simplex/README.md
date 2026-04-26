@@ -1,8 +1,8 @@
 # fdi-simplex — Plantilla LaTeX para TFG/TFM
 
-Plantilla LaTeX para la memoria del Trabajo de Fin de Grado (TFG) o de
-Máster (TFM) de la Facultad de Informática de la Universidad Complutense
-de Madrid.
+(Otra) plantilla LaTeX para la memoria del Trabajo de Fin de Grado (TFG) o de
+Máster (TFM) de la Facultad de Informática de la Universidad Complutense de
+Madrid.
 
 ## Archivos
 
@@ -10,7 +10,7 @@ de Madrid.
 |---|---|
 | `fdi-simplex.cls` | Clase LaTeX. Copiar junto al `.tex` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto al `.tex` principal. |
-| `ejemplo/` | Documentos de ejemplo compilables (`tfg.tex`, `tfm.tex`). |
+| `ejemplo/` | Documento de ejemplo con instrucciones de compilación (`tfg.tex`, `Makefile`...). |
 
 ## Uso rápido
 
@@ -63,8 +63,8 @@ lualatex memoria.tex
 | Opción | Valores | Defecto | Descripción |
 |---|---|---|---|
 | *(primera)* | `tfg` \| `tfm` | `tfg` | Tipo de documento |
-| `estilo` | `moderno` \| `minimo` \| `texis` | `moderno` | Estilo del cuerpo del documento |
-| `portada` | `normativa` \| `texis` | `normativa` | Estilo de la portada |
+| `estilo` | `digital` \| `minimo` \| `clasico` | `moderno` | Estilo del cuerpo del documento |
+| `portada` | `normativa` \| `elegante` | `normativa` | Estilo de la portada |
 | `idioma` | `es` \| `en` | `es` | Idioma principal |
 | `estilobib` | cualquier estilo biblatex | `authoryear` | Estilo bibliográfico |
 
@@ -74,24 +74,10 @@ lualatex memoria.tex
 combinación es válida. Ejemplos:
 
 ```latex
-\documentclass[tfg]{fdi-simplex}                              % moderno + normativa
-\documentclass[tfm, estilo=texis, portada=texis]{fdi-simplex} % clásico TeXiS
-\documentclass[tfg, estilo=minimo]{fdi-simplex}               % KOMA puro, sin acentos
+\documentclass[tfg]{fdi-simplex}                                   % digital + normativa
+\documentclass[tfm, estilo=clasico, portada=elegante]{fdi-simplex} % inspirado por TeXiS
+\documentclass[tfg, estilo=minimo]{fdi-simplex}                    % KOMA puro para personalizar
 ```
-
-- `estilo=moderno` — aspecto digital: serif Lora (SemiBold en títulos),
-  interlineado onehalf con sangría de párrafo, oneside, cabecera con
-  el nombre del capítulo y regla fina bajo el título, número de página
-  al pie en todas las páginas. Referencias cruzadas y citas subrayadas
-  en granate UCM; URLs en color granate con prefijo 🔗.
-  Requiere la fuente [Lora](https://fonts.google.com/specimen/Lora)
-  (variable); si no está, la plantilla avisa.
-- `estilo=minimo` — defaults de KOMA sin acento ni enlaces coloreados.
-- `estilo=texis` — twoside, serif, cabeceras con regla y versalitas
-  (reminiscente de la plantilla TeXiS).
-- `portada=normativa` — portada limpia con los campos de la normativa.
-- `portada=texis` — título flanqueado por reglas, tipo de documento en
-  versalitas bajo el escudo (inspirada en TeXiS).
 
 ### Cambiar el estilo bibliográfico
 
@@ -117,9 +103,15 @@ La normativa exige los siguientes campos en la portada:
 - `\titulacion{...}` — nombre de la titulación
 - `\cursoAcademico{...}` — curso académico (p. ej. `2024/2025`)
 
-Opcionales para la versión final:
+Para la versión final:
 
 - `\convocatoria{...}` — convocatoria de defensa
 - `\calificacion{...}` — calificación obtenida
 - `\codirector{...}` / `\cotutor{...}` — codirector o cotutor
 - `\colaboradorExterno{...}` — colaborador externo (TFM)
+
+## Crédito y contacto
+
+Licenciado bajo la Licencia Pública de la Unión Europea (EUPL-1.2 or later).
+
+- Antonio F. G. Sevilla <afgs@ucm.es> (Despacho 420bis)

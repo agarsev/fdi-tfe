@@ -1,15 +1,24 @@
 %%----------------------------------------------------------------------
-%% fdi-simplex.cls
+%%
+%%                    ~ FDI SIMPLEX ~                 /\
+%%                                                   /__\
+%% fdi-simplex.cls                                  /\  /\
+%%                                                 /__\/__\
 %%
 %% Plantilla LaTeX para Trabajos de Fin de Grado y Fin de Máster
 %% de la Facultad de Informática de la Universidad Complutense de Madrid.
+%% No es obligatoria, pero intenta cumplir con la normativa a la vez que
+%% proporcionar un estilo elegante y un uso sencillo y mínimamente intrusivo.
 %%
 %% Pensada para LuaLaTeX (soporte moderno de Unicode / fontspec),
 %% con compatibilidad razonable con pdfLaTeX como alternativa.
 %%
+%% Licenciada bajo la Licencia Pública de la Unión Europea (EUPL-1.2 or later)
+%% Autor: Antonio F. G. Sevilla <afgs@ucm.es>
+%%
 %% Uso mínimo:
 %%
-%%   \documentclass[tfg]{fdi-simplex}         % o [tfm]
+%%   \documentclass[tfg]{fdi-simplex}        % o [tfm]
 %%   \titulo{Título}
 %%   \tituloEN{English title}
 %%   \autor{Nombre Apellidos}
@@ -48,7 +57,7 @@
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fdi-simplex}[2026/04/24 v0.2 Plantilla TFG/TFM Facultad de Informática UCM]
+\ProvidesClass{fdi-simplex}[2026/04/24 v1.0 Plantilla SIMPLEX para TFG/TFM Facultad de Informática UCM]
 
 %%----------------------------------------------------------------------
 %% 1. Opciones de clase
@@ -144,9 +153,21 @@
 }
 
 % Director / Codirector (TFG)
-\newcommand{\director}[1]{\def\tfe@director{#1}}
+% \director admite varias llamadas: con una sola se renderiza como
+% "Director: X"; con varias como "Directores: X \\ Y \\ ...". El uso
+% de \codirector se conserva para el caso habitual de un director
+% principal y un codirector distinguido.
+\newcounter{tfe@ndirectores}
+\def\tfe@directores{}
+\newcommand{\director}[1]{%
+  \stepcounter{tfe@ndirectores}%
+  \ifdefempty{\tfe@directores}{%
+    \def\tfe@directores{#1}%
+  }{%
+    \appto\tfe@directores{\\#1}%
+  }%
+}
 \newcommand{\codirector}[1]{\def\tfe@codirector{#1}}
-\def\tfe@director{}
 \def\tfe@codirector{}
 
 % Tutor / Cotutor / Colaborador externo (TFM)
@@ -198,6 +219,7 @@
   \def\tfe@text@prefijoMaster{Master's in }%
   \def\tfe@text@facultad{Faculty of Computer Science, Complutense University of Madrid}%
   \def\tfe@text@director{Supervisor}%
+  \def\tfe@text@directores{Supervisors}%
   \def\tfe@text@codirector{Co-supervisor}%
   \def\tfe@text@tutor{Supervisor}%
   \def\tfe@text@cotutor{Co-supervisor}%
@@ -212,6 +234,7 @@
   \def\tfe@text@prefijoMaster{Máster en }%
   \def\tfe@text@facultad{Facultad de Informática, Universidad Complutense de Madrid}%
   \def\tfe@text@director{Director}%
+  \def\tfe@text@directores{Directores}%
   \def\tfe@text@codirector{Codirector}%
   \def\tfe@text@tutor{Tutor}%
   \def\tfe@text@cotutor{Cotutor}%
@@ -271,9 +294,11 @@
 
 \newcommand{\tfe@portadaDirector}{%
   \iftfe@tfg
-    \ifdefempty{\tfe@director}{%
+    \ifnumequal{\value{tfe@ndirectores}}{0}{%
       \ClassWarning{fdi-simplex}{Falta \string\director{...}}%
-    }{\tfe@text@director:\\ \tfe@director}%
+    }{%
+      \ifnumequal{\value{tfe@ndirectores}}{1}{\tfe@text@director}{\tfe@text@directores}:\\ \tfe@directores%
+    }%
     \ifdefempty{\tfe@codirector}{}{\\[0.4em] \tfe@text@codirector:\\ \tfe@codirector}%
   \else
     \ifdefempty{\tfe@tutor}{%
@@ -427,7 +452,6 @@
 \newenvironment{abstract}{%
   \tfe@abschead{Abstract}%
   \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
-  \ifdefempty{\@tituloEN}{}{\noindent\textit{\@tituloEN}\par\medskip}%
 }{%
   \ifdefempty{\tfe@keywords}{}{%
     \par\medskip\noindent\textbf{Keywords:} \tfe@keywords\par
