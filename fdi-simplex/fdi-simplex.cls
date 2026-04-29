@@ -46,7 +46,8 @@
 %%                           cualquier portada con cualquier estilo.
 %%   idioma=es|en            Idioma principal (defecto: es)
 %%   estilobib=<style>       Estilo biblatex (defecto: authoryear)
-%%                           Otros valores habituales: numeric, alphabetic.
+%%                           Otros valores habituales: authoryear, numeric,
+%%                           alphabetic, ieee, chicago-authordate.
 %%                           Véase https://biblatex-biber.sourceforge.net/
 %%   colorenlace=<color>     Color de enlaces, citas y URLs (defecto:
 %%                           fdiLink, un azul marino sobrio). Sólo aplica
@@ -57,7 +58,7 @@
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fdi-simplex}[2026/04/24 v1.0 Plantilla SIMPLEX para TFG/TFM Facultad de Informática UCM]
+\ProvidesClass{fdi-simplex}[2026/04/30 v1.1 Plantilla SIMPLEX para TFG/TFM Facultad de Informática UCM]
 
 %%----------------------------------------------------------------------
 %% 1. Opciones de clase
@@ -107,11 +108,13 @@
 
 \RequirePackage{microtype}
 
-% Babel: idioma principal configurable
+% Babel: idioma principal configurable.
 \ifdefstring{\tfe@idioma}{en}{%
   \RequirePackage[spanish, main=english]{babel}%
 }{%
-  \RequirePackage[english, main=spanish, es-tabla, es-noshorthands]{babel}%
+  \RequirePackage[english, main=spanish, shorthands=off]{babel}%
+  \renewcaptionname{spanish}{\listtablename}{Índice de tablas}
+  \renewcaptionname{spanish}{\tablename}{Tabla}
 }
 
 \RequirePackage{graphicx}
@@ -521,11 +524,6 @@
       BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
     ]%
     \setkomafont{disposition}{\normalcolor\tfe@dispfont}%
-    % Variante para URLs: ligeramente más pesada que el cuerpo (semibold).
-    \newfontfamily\tfe@urlfont{Lora}[%
-      Ligatures=TeX,
-      UprightFeatures={RawFeature={axis={wght=500}}},
-    ]%
   }{%
     \ClassWarningNoLine{fdi-simplex}{%
       La fuente Lora no se ha encontrado.\MessageBreak
@@ -559,6 +557,13 @@
   \addtolength{\topmargin}{1cm}%
   \addtolength{\textheight}{-1cm}%
 
+  % Prohibimos viudas y huérfanos. Con \raggedbottom el coste es sólo
+  % páginas ligeramente más cortas, imperceptible en lectura digital.
+  \clubpenalty=10000%
+  \widowpenalty=10000%
+  \displaywidowpenalty=10000%
+  \raggedbottom%
+
   % scrlayer-scrpage: cabecera con el título del capítulo o sección,
   % número de página centrado al pie. El `*' en \cfoot* mantiene el
   % número también en la apertura de capítulo (pagestyle plain).
@@ -584,35 +589,48 @@
   % texto normal.
   \setlength{\tfe@marginextra}{1cm}%
 
-  % ulem para subrayar URLs. `normalem' preserva \emph como cursiva.
-  \RequirePackage[normalem]{ulem}%
+  % lua-ul para subrayar URLs (sólo LuaLaTeX, permite partir urls).
+  \ifluatex
+    \RequirePackage{lua-ul}%
+  \fi
 
-  % Hyperref con colorlinks (sin bordes ni subrayados):
+  % Hyperref con colorlinks (sin bordes):
   %  - Referencias cruzadas, citas y URLs: en color \tfe@colorenlace
   %    (configurable con la opción de clase `colorenlace=<color>').
-  %  - URLs (\url y destinos de \href): subrayadas y en peso semibold.
-  %  - TOC: sin decoración (se asume que las entradas son pinchables).
+  %  - URLs (\url y destinos de \href): en la fuente del cuerpo y
+  %    subrayadas (sólo LuaLaTeX, vía lua-ul).
+  %  - breaklinks=true: permite que la anotación PDF del enlace abarque
+  %    también la segunda línea cuando la URL se parte.
+  %  - Listas (TOC, LoF, LoT, listings): sin decoración (se asume que
+  %    las entradas son pinchables).
   \renewcommand{\tfe@hyperrefSetup}{%
     \RequirePackage[pdfusetitle, pdfdisplaydoctitle,
       colorlinks=true,
+      breaklinks=true,
       linkcolor=\tfe@colorenlace,
       citecolor=\tfe@colorenlace,
       urlcolor=\tfe@colorenlace]{hyperref}%
-    % URLs en la fuente del cuerpo, peso semibold y subrayadas. Patcheamos
-    % \hyper@linkurl (afecta a \url y a \href con destino URL) para envolver
-    % el texto mostrado en \uline.
     \urlstyle{same}%
-    \@ifundefined{tfe@urlfont}{}{\renewcommand{\UrlFont}{\tfe@urlfont}}%
-    \let\tfe@orig@hyper@linkurl\hyper@linkurl
-    % \ULdepth por defecto (\maxdimen) hace que ulem auto-detecte el
-    % descender y la regla quede muy por debajo de las letras (parece
-    % una caja). Lo fijamos para que el subrayado quede pegado al texto.
-    \def\hyper@linkurl##1##2{%
-      \tfe@orig@hyper@linkurl{{\setlength{\ULdepth}{1.8pt}\uline{##1}}}{##2}}%
-    % TOC sin decoración de links (restablece al salir del grupo).
-    \let\tfe@origtoc\tableofcontents
-    \renewcommand{\tableofcontents}{%
-      \begingroup\hypersetup{hidelinks}\tfe@origtoc\endgroup}%
+    % Subrayado break-aware vía lua-ul.
+    \ifluatex
+      \let\tfe@orig@hyper@linkurl\hyper@linkurl
+      \def\hyper@linkurl##1##2{%
+        \tfe@orig@hyper@linkurl{\underLine[bottom=-.5ex, height=0.5pt]{##1}}{##2}}%
+    \fi
+    % Listas sin decoración de links (restablece al salir del grupo).
+    % Cubre TOC, índice de figuras, índice de tablas y, si el usuario
+    % carga `listings' o `minted', sus respectivas listas de listados.
+    \providecommand{\tfe@hidelinkswrap}[1]{%
+      \csletcs{tfe@orig@##1}{##1}%
+      \csdef{##1}{\begingroup\hypersetup{hidelinks}\csuse{tfe@orig@##1}\endgroup}%
+    }%
+    \tfe@hidelinkswrap{tableofcontents}%
+    \tfe@hidelinkswrap{listoffigures}%
+    \tfe@hidelinkswrap{listoftables}%
+    \AtBeginDocument{%
+      \@ifundefined{lstlistoflistings}{}{\tfe@hidelinkswrap{lstlistoflistings}}%
+      \@ifundefined{listoflistings}{}{\tfe@hidelinkswrap{listoflistings}}%
+    }%
   }%
 }{%
 \ifdefstring{\tfe@estilo}{clasico}{%
@@ -630,6 +648,10 @@
   \addtolength{\textheight}{14mm}%
   \setlength{\parskip}{0.2ex}%
   \linespread{1.05}%
+
+  \clubpenalty=9999%
+  \widowpenalty=9999%
+  \displaywidowpenalty=9999%
 
   % Títulos en serif (KOMA los pone sans por defecto).
   \addtokomafont{disposition}{\rmfamily}%
@@ -660,34 +682,23 @@
 %%----------------------------------------------------------------------
 \RequirePackage[backend=biber, style=\tfe@estilobib]{biblatex}
 
-% Con authoryear, la cita por defecto es «Autor Año». Envolvemos el año
-% entre paréntesis para dar la forma habitual «Autor (Año)». Mantenemos
-% el `bibhyperref` para que la referencia siga siendo pinchable.
-\ifdefstring{\tfe@estilobib}{authoryear}{%
-  \renewbibmacro*{cite:labeldate+extradate}{%
-    \iffieldundef{labelyear}%
-      {}%
-      {\printtext[bibhyperref]{\printtext[parens]{\printlabeldateextra}}}%
-  }%
-}{}
-
-% Damos un poco más de aire entre las entradas
-% de la bibliografía, que en authoryear quedan demasiado apretadas.
+% Damos un poco más de aire entre las entradas de la bibliografía, que
+% en estilos autor-año quedan demasiado apretadas.
 \setlength{\bibitemsep}{0.6em plus 0.1em}%
 
 %%----------------------------------------------------------------------
-%% 9. hyperref al final del preámbulo (debe ir el último)
+%% 9. hyperref
+%%
+%% Se pueden redefinir opciones con \hypersetup{...} en caso necesario.
 %%
 %% \tfe@hyperrefSetup se define en la sección 7 para que los estilos
-%% puedan redefinirlo. Aquí sólo lo invocamos en \AtEndPreamble.
+%% puedan redefinirlo.
 %%----------------------------------------------------------------------
-\AtEndPreamble{%
-  \tfe@hyperrefSetup
-  \AtBeginDocument{%
-    \hypersetup{%
-      pdfsubject={\tfe@tipoDoc},%
-      pdfkeywords={\tfe@palabrasClave; \tfe@keywords}%
-    }%
+\tfe@hyperrefSetup
+\AtBeginDocument{%
+  \hypersetup{%
+    pdfsubject={\tfe@tipoDoc},%
+    pdfkeywords={\tfe@palabrasClave; \tfe@keywords}%
   }%
 }
 
