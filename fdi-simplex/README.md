@@ -10,7 +10,8 @@ Madrid.
 |---|---|
 | `fdi-simplex.cls` | Clase LaTeX. Copiar junto al `.tex` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto al `.tex` principal. |
-| `ejemplo/` | Documento de ejemplo con instrucciones de compilación (`tfg.tex`, `Makefile`...). |
+| `ejemplo-tfg/` | Ejemplo de **TFG**: trabajo en grupo, director/codirector, contribuciones individuales (`tfg.tex`, `Makefile`...). |
+| `ejemplo-tfm/` | Ejemplo de **TFM**: trabajo individual, tutor/cotutor, colaborador externo, `\convocatoria`, resumen en inglés primero (`tfm.tex`, `Makefile`...). |
 
 ## Uso rápido
 

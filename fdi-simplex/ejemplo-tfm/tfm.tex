@@ -1,0 +1,80 @@
+\documentclass[tfm,estilo=digital,portada=normativa]{fdi-simplex}
+
+\titulo{Un sistema para ilustrar la plantilla fdi-simplex}
+\tituloEN{A system to showcase the fdi-simplex template}
+
+\autor{Meriadoc Brandigamo}
+\tutor{Gandalf el Gris}
+\cotutor{Elrond Medio-elfo}
+\colaboradorExterno{Aragorn hijo de Arathorn (Gondor S.A.)}
+
+% \titulacion recibe solo el nombre del máster, sin el prefijo "Máster
+% en": la portada añade "Máster en ..." automáticamente en el TFM.
+\titulacion{Ingeniería Informática}
+\cursoAcademico{2098/2099}
+
+% --- Campos de la VERSIÓN FINAL (normativa) ---
+% \convocatoria y \calificacion solo se rellenan al depositar la versión
+% definitiva; aquí van activos para mostrar cómo aparecen en la portada.
+\convocatoria{Junio de 2099}
+\calificacion{10 (Sobresaliente)}
+
+\palabrasClave{LaTeX, plantilla, TFM, Facultad de Informática}
+\keywords{LaTeX, template, master's thesis, Computer Science Faculty}
+
+\addbibresource{bibliografia.bib}
+
+% - OPCIONES DE PERSONALIZACION -
+
+% Usar si se guarda el escudo en otra ubicación
+%\logo{img/Escudo_UCM}
+
+% Para cambiar las fuente tipográficas (solo LuaLaTeX/XeLaTeX)
+%\setmainfont{Source Serif 4}
+%\setmonofont{Source Code Pro}
+
+\begin{document}
+
+\makeportada
+
+\frontmatter
+
+% Normativa (TFM, punto 6): en el TFM el resumen en INGLÉS va primero,
+% al contrario que en el TFG. Por eso `abstract' precede a `resumen'.
+\begin{abstract}
+This document demonstrates the \texttt{fdi-simplex} template for
+writing the report of a Master's Thesis at the Faculty of
+Computer Science of the Complutense University of Madrid. The
+template provides a normalized cover page, bilingual abstract and
+keyword environments, and biblatex integration. For a Master's
+thesis the regulations ask for an English abstract of roughly half
+a page, placed before the Spanish one.
+\keywords{LaTeX, template, master's thesis, Computer Science Faculty, Complutense University of Madrid}
+\end{abstract}
+
+\begin{resumen}
+Este documento demuestra el uso de la plantilla \texttt{fdi-simplex}
+para redactar la memoria de un Trabajo de Fin de Máster en la
+Facultad de Informática de la Universidad Complutense de Madrid. La
+plantilla incluye la portada normalizada, entornos bilingües para
+resumen y palabras clave, e integración con biblatex.
+\palabrasClave{LaTeX, plantilla, TFM, Facultad de Informática, Universidad Complutense de Madrid}
+\end{resumen}
+
+\tableofcontents
+
+\mainmatter
+
+\input{capitulos/introduccion}
+\input{capitulos/desarrollo}
+\input{capitulos/conclusiones}
+\input{capitulos/conclusiones-en}
+
+\backmatter
+
+% A diferencia del TFG, el TFM es individual: no lleva el entorno
+% `contribucion' (reservado a los trabajos en grupo).
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
