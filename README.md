@@ -16,6 +16,7 @@ normativa escrita pero no necesariamente a los usos y costumbres de la facultad.
 ## Contenidos
 
 - `fdi-simplex`: Plantilla Latex para elaborar la memoria.
+- `fdi-tippex`: La misma plantilla, en Typst.
 
 ## Notas
 
