@@ -11,6 +11,20 @@ umbral de todas las puertas, y todos los senderos eran ríos tributarios. «Es
 muy peligroso, Frodo, cruzar la puerta», solía decirme. «Vas hacia el Camino,
 y si no cuidas tus pasos no sabes hacia donde te arrastrarán».
 
+Las imágenes se guardan en la carpeta `img/` y se incluyen con `#image(...)`
+dentro de una `#figure(...)`, que les añade un pie y una etiqueta para poder
+referenciarlas, como en la @fig:bolson-cerrado. Si la imagen no es propia, el
+pie debe indicar su autoría y procedencia.
+
+// Las rutas son relativas al archivo actual, de ahí el `../`.
+#figure(
+  image("../img/bolson_cerrado.jpg", width: 80%),
+  caption: [Bolsón Cerrado, residencia de los Bolsón, en el decorado de
+    Hobbiton (Matamata, Nueva Zelanda). Fotografía de Pseudopanax (2018),
+    en dominio público. Fuente: Wikimedia Commons,
+    #link("https://commons.wikimedia.org/wiki/File:Baggins_residence_'Bag_End'.jpg").],
+) <fig:bolson-cerrado>
+
 == Arquitectura <sec:arquitectura>
 
 La arquitectura del sistema sigue el patrón de separación entre normativa y

@@ -507,21 +507,41 @@
   % centrado al pie en todas las páginas. Enlaces coloreados (sin
   % bordes ni subrayados).
 
+  % Pies de figura y tabla centrados y sin sangría francesa (KOMA cuelga
+  % las líneas siguientes bajo el texto, dejando fuera la etiqueta).
+  \setcapindent{0pt}%
+  \setcaptionalignment{c}%
+
   % Fuente: Lora. Si no está instalada, avisamos fuerte para que el
   % estudiante lo sepa (nada de fallback silencioso). Usamos la versión
   % variable del archivo para poder pedir un peso SemiBold (600) para
   % los encabezados y Bold (700) para el \textbf normal.
   \IfFontExistsTF{Lora}{%
+    % La cursiva es un archivo aparte (Lora-Italic). Si falta, avisamos
+    % y seguimos con la recta en su lugar para no romper la compilación.
+    \IfFontExistsTF{Lora Italic}{%
+      \def\tfe@loraIt{Lora Italic}%
+    }{%
+      \def\tfe@loraIt{Lora}%
+      \ClassWarningNoLine{fdi-simplex}{%
+        Falta la cursiva de Lora (Lora Italic):\MessageBreak
+        el texto en cursiva saldra en redonda.\MessageBreak
+        Instala la familia completa desde\MessageBreak
+        https://fonts.google.com/specimen/Lora%
+      }%
+    }%
     \setmainfont{Lora}[%
       Ligatures=TeX,
       BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
-      ItalicFont={Lora}, ItalicFeatures={RawFeature={axis={wght=400}}},
-      BoldItalicFont={Lora}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
+      ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=400}}},
+      BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
     ]%
     \newfontfamily\tfe@dispfont{Lora}[%
       Ligatures=TeX,
       UprightFeatures={RawFeature={axis={wght=600}}},
       BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
+      ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=600}}},
+      BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
     ]%
     \setkomafont{disposition}{\normalcolor\tfe@dispfont}%
   }{%
@@ -656,6 +676,11 @@
   % Títulos en serif (KOMA los pone sans por defecto).
   \addtokomafont{disposition}{\rmfamily}%
 
+  % Pies de figura y tabla centrados y sin sangría francesa (KOMA cuelga
+  % las líneas siguientes bajo el texto, dejando fuera la etiqueta).
+  \setcapindent{0pt}%
+  \setcaptionalignment{c}%
+
   % Cabeceras estilo TeXiS: regla fina, capítulo en versalitas en páginas
   % pares, sección en impares, número de página en el borde exterior.
   % En aperturas de capítulo (pagestyle plain) se omite la cabecera y el
@@ -695,8 +720,13 @@
 %% puedan redefinirlo.
 %%----------------------------------------------------------------------
 \tfe@hyperrefSetup
+% `pdfusetitle' no basta: sólo captura \title y \author si se llaman
+% después de cargar hyperref, y aquí \titulo y \autor no pasan por
+% ellos. Fijamos título y autores explícitamente.
 \AtBeginDocument{%
   \hypersetup{%
+    pdftitle={\@title},%
+    pdfauthor={\tfe@autoresPlain},%
     pdfsubject={\tfe@tipoDoc},%
     pdfkeywords={\tfe@palabrasClave; \tfe@keywords}%
   }%

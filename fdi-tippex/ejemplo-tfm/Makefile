@@ -8,7 +8,7 @@ FLAGS = --root ..
 
 all: $(DOCS)
 
-%.pdf: %.typ ../fdi-tippex.typ ../Escudo_UCM.png bibliografia.bib $(wildcard capitulos/*)
+%.pdf: %.typ ../fdi-tippex.typ ../Escudo_UCM.png bibliografia.bib $(wildcard capitulos/*) $(wildcard img/*)
 	$(TYPST) compile $(FLAGS) $< $@
 
 watch:

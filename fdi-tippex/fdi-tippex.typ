@@ -12,6 +12,8 @@
 // proporcionar un estilo elegante y un uso sencillo y mínimamente intrusivo.
 //
 // Licenciada bajo la Licencia Pública de la Unión Europea (EUPL-1.2 or later)
+// Autores: - Daniel Pantoja Joaristi
+//          - Antonio F. G. Sevilla <afgs@ucm.es>
 //
 // Uso mínimo:
 //
@@ -482,7 +484,8 @@
     link(el.location(), [#sup~#n])
   }
 
-  set figure(numbering: n => {
+  // Las figuras flotan (arriba o abajo de la página), como en LaTeX.
+  set figure(placement: auto, numbering: n => {
     let cap = counter(heading).get().first()
     numbering("1.1", cap, n)
   })
