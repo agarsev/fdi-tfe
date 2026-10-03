@@ -1,9 +1,9 @@
 //----------------------------------------------------------------------
-//
-//                    ~ FDI TIPPEX ~                  /\
-//                                                   /__\
-// fdi-tippex.typ                                   /\  /\
-//                                                 /__\/__\
+//                                                     _
+//                    ~ FDI TIPPEX ~                  |_|
+//                                                   /   \
+// fdi-tippex.typ                                   |  T  |
+//                                                   \___/
 //
 // Plantilla Typst para Trabajos de Fin de Grado y Fin de Máster de la
 // Facultad de Informática de la Universidad Complutense de Madrid.
@@ -53,6 +53,17 @@
 //----------------------------------------------------------------------
 
 #let _estilo = state("fdi-tippex-estilo", "digital")
+
+// Tamaños de fuente: los de fdi-simplex (KOMA-Script a 11pt), de \small
+// a \huge, redondeados (el punto de Typst es un 0.4% mayor que el de TeX).
+#let _tam = (
+  small: 10pt,
+  normal: 11pt,
+  large: 12pt,
+  Large: 14.4pt,
+  LARGE: 17.3pt,
+  huge: 20.7pt,
+)
 
 #let fdi-tippex(
   tipo: "tfg",
@@ -151,8 +162,28 @@
   let fuente = if digital { "Lora" } else if clasico { "New Computer Modern" } else { "Libertinus Serif" }
   let fuente-mono = if digital { "IBM Plex Mono" } else { "DejaVu Sans Mono" }
 
-  set text(font: fuente, lang: idioma, size: 11pt)
+  set text(font: fuente, lang: idioma, size: _tam.normal)
   show raw: set text(font: fuente-mono)
+  // Typst reduce el texto monoespaciado al 80%, que ya iguala la altura
+  // de la x de DejaVu Sans Mono con la del cuerpo. IBM Plex Mono es más
+  // pequeña: con Lora se igualan al 97% (0.8 × 1.21).
+  show raw: set text(size: 1.21em) if digital
+
+  // Interlineado y separación entre párrafos. Digital: holgado. Clasico:
+  // poca separación. Minimo (KOMA parskip=half-): media línea entre
+  // párrafos.
+  let interlineado = if digital { 0.85em } else if clasico { 0.62em } else { 0.58em }
+  let entre-parrafos = if digital { 1.1em } else if clasico { 0.71em } else { 1.2em }
+
+  // Márgenes: los de KOMA con DIV=12 (DIV=8 en el estilo clasico). El
+  // estilo digital baja 1cm el bloque de texto.
+  let margen = if clasico {
+    (inside: 3.24cm, outside: 5.08cm, top: 4.63cm, bottom: 4.76cm)
+  } else if digital {
+    (x: 2.625cm, top: 3.59cm, bottom: 4.85cm)
+  } else {
+    (x: 2.625cm, top: 2.59cm, bottom: 4.85cm)
+  }
 
   //--------------------------------------------------------------------
   // Portadas
@@ -219,32 +250,35 @@
   }
 
   let pagina-portada(contenido) = page(
-    margin: (x: 3cm, top: 2.8cm, bottom: 2.5cm),
+    margin: margen,
     header: none,
     footer: none,
     numbering: none,
-    align(center, contenido),
+    {
+      set par(leading: interlineado, spacing: 0pt)
+      align(center, contenido)
+    },
   )
 
   if portada == "normativa" {
     // Layout limpio y funcional con los campos de la normativa.
     pagina-portada({
       escudo
-      v(1.2cm)
-      text(size: 1.2em, rotulo)
+      v(1.5cm)
+      text(size: _tam.large, rotulo)
       v(1fr)
       // Algo más estrecho que la caja de texto para que los títulos
       // largos partan en varias líneas legibles.
       block(width: 82%, {
-        text(size: 2em, weight: "bold", titulo)
+        text(size: _tam.huge, weight: "bold", titulo)
         if titulo-en != "" {
-          v(0.4em)
-          text(size: 1.45em, style: "italic", titulo-en)
+          v(2.1em)
+          text(size: _tam.Large, style: "italic", titulo-en)
         }
       })
       v(1fr)
-      text(size: 1.2em, bloque-autores)
-      v(0.8cm)
+      text(size: _tam.large, bloque-autores)
+      v(1.2cm)
       bloque-direccion
       v(1fr)
       bloque-final
@@ -256,19 +290,19 @@
       v(1fr)
       line(length: 75%, stroke: 0.5mm)
       v(0.4em)
-      text(size: 2em, weight: "bold", titulo)
+      text(size: _tam.huge, weight: "bold", titulo)
       if titulo-en != "" {
         v(0.2em)
-        text(size: 1.45em, style: "italic", titulo-en)
+        text(size: _tam.Large, style: "italic", titulo-en)
       }
       v(0.4em)
       line(length: 75%, stroke: 0.5mm)
       v(1fr)
       escudo
       v(0.8em)
-      text(size: 1.45em, weight: "bold", upper(tipo-doc))
+      text(size: _tam.Large, weight: "bold", upper(tipo-doc))
       v(1fr)
-      text(size: 1.2em, bloque-autores)
+      text(size: _tam.large, bloque-autores)
       v(0.6cm)
       bloque-direccion
       v(1fr)
@@ -311,25 +345,28 @@
 
   let num-pagina = context counter(page).display()
 
+  // Cabecera con un filete fino debajo.
+  let filete(grosor, contenido) = block(
+    width: 100%,
+    inset: (bottom: 4.6pt),
+    stroke: (bottom: grosor),
+    contenido,
+  )
+
   let (cabecera, pie) = if digital {
     (
       context if not abre-capitulo() {
-        set text(size: 0.9em)
-        capitulo-actual()
-        v(-0.6em)
-        line(length: 100%, stroke: 0.4pt)
+        set text(size: _tam.small)
+        filete(0.4pt, capitulo-actual())
       },
-      align(center, text(size: 0.9em, num-pagina)),
+      align(center, text(size: _tam.small, num-pagina)),
     )
   } else if clasico {
     (
       context if not abre-capitulo() and not en-blanco() {
-        set text(size: 0.9em)
         let par = calc.even(here().page())
         let marca = smallcaps(capitulo-actual())
-        if par { num-pagina; h(1fr); marca } else { marca; h(1fr); num-pagina }
-        v(-0.6em)
-        line(length: 100%, stroke: 0.2pt)
+        filete(0.2pt, if par { num-pagina; h(1fr); marca } else { marca; h(1fr); num-pagina })
       },
       context if abre-capitulo() {
         let par = calc.even(here().page())
@@ -345,28 +382,29 @@
     numbering: "i",
     header: cabecera,
     footer: pie,
-    margin: if clasico {
-      (inside: 3.5cm, outside: 2.5cm, top: 3.5cm, bottom: 3cm)
-    } else if digital {
-      (x: 2.8cm, top: 3.5cm, bottom: 2.8cm)
-    } else {
-      (x: 2.8cm, y: 2.8cm)
-    },
+    header-ascent: 23.3pt,
+    footer-descent: if digital { 41pt } else if clasico { 37.5pt } else { 40pt },
+    margin: margen,
   )
   counter(page).update(1)
 
   //--------------------------------------------------------------------
   // Párrafos
   //--------------------------------------------------------------------
-  // Digital: interlineado holgado y sangría. Clasico: sangría y poca
-  // separación. Minimo (KOMA parskip=half-): sin sangría, media línea
-  // entre párrafos.
+  // Digital y clasico: sangría en todos los párrafos, también el primero
+  // tras un título (como hace babel en castellano). Minimo: sin sangría.
   set par(
     justify: true,
-    leading: if digital { 0.8em } else { 0.65em },
-    spacing: if digital { 1em } else if clasico { 0.7em } else { 1.2em },
-    first-line-indent: if digital { 1em } else if clasico { 1.5em } else { 0em },
+    leading: interlineado,
+    spacing: entre-parrafos,
+    first-line-indent: (amount: if digital or clasico { 1em } else { 0em }, all: true),
   )
+
+  // Listas: sangradas y con la misma separación que los párrafos.
+  set list(indent: 1.6em, body-indent: 0.5em, spacing: entre-parrafos)
+  set enum(indent: 1.22em, body-indent: 0.5em, spacing: entre-parrafos)
+  show list: set block(spacing: entre-parrafos)
+  show enum: set block(spacing: entre-parrafos)
 
   //--------------------------------------------------------------------
   // Títulos
@@ -375,8 +413,32 @@
   // reinicia la numeración de figuras, que pasa a ser "capítulo.n".
   //--------------------------------------------------------------------
   set heading(numbering: "1.1.")
-  show heading: set text(weight: if digital { "semibold" } else { "bold" })
+  show heading: set text(weight: if digital { "semibold" } else { "bold" }, size: _tam.normal)
+  show heading.where(level: 1): set text(size: _tam.huge)
+  show heading.where(level: 2): set text(size: _tam.Large)
+  show heading.where(level: 3): set text(size: _tam.large)
   show heading.where(level: 1): set heading(supplement: rot.capitulo)
+
+  // Secciones y niveles inferiores: espacio antes y después del título,
+  // por nivel, y un cuadratín entre el número y el texto.
+  let aire = if digital {
+    ((34pt, 24.5pt), (30pt, 20pt), (29.5pt, 20pt))
+  } else if clasico {
+    ((26pt, 18.5pt), (22.5pt, 14.5pt), (22.5pt, 14.5pt))
+  } else {
+    ((31pt, 23.5pt), (27.5pt, 20pt), (27pt, 20pt))
+  }
+  show heading: it => {
+    if it.level == 1 { return it }
+    let (antes, despues) = aire.at(calc.min(it.level, 4) - 2)
+    block(above: antes, below: despues, sticky: true, {
+      if it.numbering != none {
+        counter(heading).display(it.numbering)
+        h(1em)
+      }
+      it.body
+    })
+  }
 
   show heading.where(level: 1): it => {
     [#metadata(none)<fdi-tippex-fin>]
@@ -385,31 +447,30 @@
     counter(figure.where(kind: table)).update(0)
     counter(figure.where(kind: raw)).update(0)
     set par(justify: false, first-line-indent: 0em)
+    set block(spacing: 0pt)
     let numero = if it.numbering != none { counter(heading).display("1") }
     if clasico {
-      v(3em)
+      v(53.5pt)
       if numero != none {
-        text(size: 1.45em, [#rot.capitulo #numero])
-        v(0.6em)
+        block[#rot.capitulo #numero]
+        v(26pt)
       }
-      block(text(size: 2em, it.body))
-      v(2.5em)
+      block(it.body)
+      v(32.5pt, weak: true)
     } else {
-      v(if digital { 1em } else { 2em })
-      block(text(size: 1.75em, {
+      v(if digital { 66pt } else { 57.5pt })
+      block({
         if numero != none [#numero.#h(0.5em)]
         it.body
-      }))
+      })
       if digital {
-        v(-0.5em)
+        v(13.5pt)
         line(length: 100%, stroke: 0.5pt)
       }
-      v(1.5em)
+      v(if digital { 41.5pt } else { 36pt }, weak: true)
     }
   }
 
-  show heading.where(level: 2): set text(size: 1.2em)
-  show heading.where(level: 2): set block(above: 1.8em, below: 1em)
   // Referencias a capítulos y secciones sin el punto final de la
   // numeración ("sección 2.1", no "Sección 2.1.").
   show ref: it => {
@@ -430,7 +491,7 @@
   // Índice: capítulos en negrita sin puntos, como en KOMA.
   //--------------------------------------------------------------------
   show outline.entry.where(level: 1): it => {
-    v(0.9em, weak: true)
+    v(interlineado + 1em, weak: true)
     let pre = if it.prefix() != none { strong(it.prefix()) }
     link(it.element.location(),
       it.indented(pre, strong(it.body() + h(1fr) + it.page())))
@@ -451,8 +512,9 @@
   //--------------------------------------------------------------------
   // Bibliografía
   //--------------------------------------------------------------------
+  // Algo de aire entre las entradas, que si no quedan apretadas.
   set bibliography(style: estilobib)
-  show bibliography: set par(first-line-indent: 0em, spacing: 0.8em)
+  show bibliography: set par(first-line-indent: 0em, spacing: interlineado + 0.6em)
 
   _estilo.update(estilo)
   body
@@ -481,23 +543,29 @@
 // lista de ≤ 10 palabras clave. Aparecen en el índice sin numerar.
 //----------------------------------------------------------------------
 #let _seccion-previa(titulo, idioma: auto, body) = {
-  show heading.where(level: 1): it => {
+  show heading.where(level: 1): it => context {
+    let clasico = _estilo.get() == "clasico"
     [#metadata(none)<fdi-tippex-fin>]
-    context pagebreak(weak: true, to: if _estilo.get() == "clasico" { "odd" })
-    v(2em)
-    align(center, text(size: 1.45em, it.body))
-    v(1.5em)
+    pagebreak(weak: true, to: if clasico { "odd" })
+    set block(spacing: 0pt)
+    v(if clasico { 53.5pt } else { 59.5pt })
+    block(width: 100%, align(center, text(size: _tam.LARGE, it.body)))
+    v(if clasico { 36pt } else { 40.5pt }, weak: true)
   }
   heading(level: 1, numbering: none, titulo)
   // En el estilo digital el bloque es ligeramente más estrecho.
   let texto = if idioma == auto { body } else { text(lang: idioma, body) }
-  context pad(x: if _estilo.get() == "digital" { 1cm } else { 0pt }, texto)
+  context {
+    // El primer párrafo va sin sangría.
+    set par(first-line-indent: (amount: par.first-line-indent.amount, all: false))
+    pad(x: if _estilo.get() == "digital" { 1cm } else { 0pt }, texto)
+  }
 }
 
 #let resumen(palabras-clave: none, body) = _seccion-previa("Resumen", idioma: "es", {
   body
   if palabras-clave != none {
-    parbreak()
+    v(0.55em)
     par(first-line-indent: 0em)[*Palabras clave:* #palabras-clave]
   }
 })
@@ -505,7 +573,7 @@
 #let abstract(keywords: none, body) = _seccion-previa("Abstract", idioma: "en", {
   body
   if keywords != none {
-    parbreak()
+    v(0.55em)
     par(first-line-indent: 0em)[*Keywords:* #keywords]
   }
 })
