@@ -1,0 +1,7 @@
+[package]
+name = "fdi-tippex"
+version = "26.10.3"
+entrypoint = "fdi-tippex.typ"
+authors = ["Daniel Pantoja Joaristi", "Antonio F. G. Sevilla <afgs@ucm.es>"]
+license = "EUPL-1.2"
+description = "Plantilla para TFG/TFM de la Facultad de Informática de la UCM."

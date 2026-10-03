@@ -58,7 +58,7 @@
 %%----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fdi-simplex}[2026/04/30 v1.1 Plantilla SIMPLEX para TFG/TFM Facultad de Informática UCM]
+\ProvidesClass{fdi-simplex}[2026/10/03 v26.10.3 Plantilla SIMPLEX para TFG/TFM Facultad de Informática UCM]
 
 %%----------------------------------------------------------------------
 %% 1. Opciones de clase

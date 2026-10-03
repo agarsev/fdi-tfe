@@ -11,6 +11,7 @@ mismas opciones y mismo aspecto, pero en Typst.
 |---|---|
 | `fdi-tippex.typ` | Plantilla. Copiar junto al `.typ` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto a `fdi-tippex.typ`. |
+| `typst.toml` | Manifiesto de paquete Typst (nombre, versión). No hace falta copiarlo. |
 | `ejemplo-tfg/` | Ejemplo de **TFG**: trabajo en grupo, director/codirector, contribuciones individuales (`tfg.typ`, `Makefile`...). |
 | `ejemplo-tfm/` | Ejemplo de **TFM**: trabajo individual, tutor/cotutor, colaborador externo, convocatoria, resumen en inglés primero (`tfm.typ`, `Makefile`...). |
 
@@ -142,6 +143,13 @@ Para la versión final:
   TFG en grupo.
 - `#show: principal`: empieza la parte principal (equivale a `\mainmatter`),
   con numeración de páginas arábiga desde 1. Lo anterior va en romanos.
+
+## Versiones
+
+Las versiones siguen la fecha de publicación, en formato `AA.M.D` (sin ceros a
+la izquierda): la `26.10.3` es la del 3 de octubre de 2026. La versión de una
+copia de la plantilla se puede consultar en la cabecera de `fdi-tippex.typ`, y
+también figura en `typst.toml`.
 
 ## Crédito y contacto
 

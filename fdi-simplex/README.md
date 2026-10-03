@@ -64,7 +64,7 @@ lualatex memoria.tex
 | Opción | Valores | Defecto | Descripción |
 |---|---|---|---|
 | *(primera)* | `tfg` \| `tfm` | `tfg` | Tipo de documento |
-| `estilo` | `digital` \| `minimo` \| `clasico` | `moderno` | Estilo del cuerpo del documento |
+| `estilo` | `digital` \| `minimo` \| `clasico` | `digital` | Estilo del cuerpo del documento |
 | `portada` | `normativa` \| `elegante` | `normativa` | Estilo de la portada |
 | `idioma` | `es` \| `en` | `es` | Idioma principal |
 | `estilobib` | cualquier estilo biblatex | `authoryear` | Estilo bibliográfico |
@@ -110,6 +110,13 @@ Para la versión final:
 - `\calificacion{...}` — calificación obtenida
 - `\codirector{...}` / `\cotutor{...}` — codirector o cotutor
 - `\colaboradorExterno{...}` — colaborador externo (TFM)
+
+## Versiones
+
+Las versiones siguen la fecha de publicación, en formato `AA.M.D` (sin ceros a
+la izquierda): la `26.10.3` es la del 3 de octubre de 2026. La versión de una
+copia de la plantilla se puede consultar en la línea `\ProvidesClass` de
+`fdi-simplex.cls`, o en el `.log` de la compilación.
 
 ## Crédito y contacto
 

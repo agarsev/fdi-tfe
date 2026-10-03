@@ -14,6 +14,7 @@
 // Licenciada bajo la Licencia Pública de la Unión Europea (EUPL-1.2 or later)
 // Autores: - Daniel Pantoja Joaristi
 //          - Antonio F. G. Sevilla <afgs@ucm.es>
+// Versión: 26.10.3
 //
 // Uso mínimo:
 //

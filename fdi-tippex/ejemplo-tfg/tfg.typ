@@ -1,3 +1,7 @@
+// Compilar con:
+//
+//   typst compile --root .. tfg.typ
+
 #import "../fdi-tippex.typ": fdi-tippex, resumen, abstract, contribucion, principal
 
 #show: fdi-tippex.with(
