@@ -6,14 +6,14 @@ BUILDDIR = build
 
 export TEXINPUTS := .:..:
 
-.PHONY: clean
+.PHONY: all clean
 
 all: $(DOCS)
 
 %.pdf: $(BUILDDIR)/%.pdf
 	cp $< $@
 
-$(BUILDDIR)/%.pdf: %.tex ../fdi-simplex.cls ../Escudo_UCM.png $(wildcard capitulos/*) $(wildcard img/*) | $(BUILDDIR)
+$(BUILDDIR)/%.pdf: %.tex ../fdi-simplex.cls ../Escudo_UCM.png bibliografia.bib $(wildcard capitulos/*) $(wildcard img/*) | $(BUILDDIR)
 	$(LATEX) $(FLAGS) -output-directory=$(BUILDDIR) $<
 	$(BIBER) $(BUILDDIR)/$*
 	$(LATEX) $(FLAGS) -output-directory=$(BUILDDIR) $<

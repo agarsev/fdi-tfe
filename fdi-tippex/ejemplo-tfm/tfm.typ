@@ -28,6 +28,11 @@
   convocatoria: "Junio de 2099",
   calificaciones: "10 (Sobresaliente)",
 
+  palabras-clave: ("Typst", "plantilla", "TFM", "Facultad de Informática",
+    "Universidad Complutense de Madrid"),
+  keywords: ("Typst", "template", "master's thesis",
+    "Computer Science Faculty", "Complutense University of Madrid"),
+
   // - OPCIONES DE PERSONALIZACIÓN -
 
   // Usar si se guarda el escudo en otra ubicación
@@ -40,7 +45,7 @@
 
 // Normativa (TFM, punto 6): en el TFM el resumen en INGLÉS va primero, al
 // contrario que en el TFG. Por eso `abstract` precede a `resumen`.
-#abstract(keywords: [Typst, template, master's thesis, Computer Science Faculty, Complutense University of Madrid])[
+#abstract[
   This document demonstrates the `fdi-tippex` template for writing the report
   of a Master's Thesis at the Faculty of Computer Science of the Complutense
   University of Madrid. The template provides a normalized cover page,
@@ -49,7 +54,7 @@
   a page, placed before the Spanish one.
 ]
 
-#resumen(palabras-clave: [Typst, plantilla, TFM, Facultad de Informática, Universidad Complutense de Madrid])[
+#resumen[
   Este documento demuestra el uso de la plantilla `fdi-tippex` para redactar
   la memoria de un Trabajo de Fin de Máster en la Facultad de Informática de
   la Universidad Complutense de Madrid. La plantilla incluye la portada

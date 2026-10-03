@@ -21,6 +21,11 @@
   curso-academico: "2098/2099",
   // convocatoria: "Junio 2099",                             // Poner en la versión final
 
+  palabras-clave: ("Typst", "plantilla", "TFG", "Facultad de Informática",
+    "Universidad Complutense de Madrid"),
+  keywords: ("Typst", "template", "bachelor's thesis",
+    "Computer Science Faculty", "Complutense University of Madrid"),
+
   // - OPCIONES DE PERSONALIZACIÓN -
 
   // Usar si se guarda el escudo en otra ubicación
@@ -31,7 +36,7 @@
 // #set text(font: "Source Serif 4")
 // #show raw: set text(font: "Source Code Pro")
 
-#resumen(palabras-clave: [Typst, plantilla, TFG, Facultad de Informática, Universidad Complutense de Madrid])[
+#resumen[
   Este documento demuestra el uso de la plantilla `fdi-tippex` para redactar
   la memoria de un Trabajo de Fin de Grado en la Facultad de Informática de la
   Universidad Complutense de Madrid. La plantilla incluye la portada
@@ -40,8 +45,8 @@
 ]
 
 // En TFG el resumen en castellano va primero. (En TFM, por normativa punto 6,
-// el abstract en inglés precede al resumen: véase ../ejemplo-tfm.)
-#abstract(keywords: [Typst, template, bachelor's thesis, Computer Science Faculty, Complutense University of Madrid])[
+// el abstract en inglés precede al resumen: véase el ejemplo de TFM.)
+#abstract[
   This document demonstrates the `fdi-tippex` template for writing the report
   of a Bachelor's Thesis at the Faculty of Computer Science of the Complutense
   University of Madrid. The template provides a normalized cover page,
@@ -54,6 +59,8 @@
 #show: principal
 
 #include "capitulos/introduccion.typ"
+// Normativa (TFG): la introducción debe ir también en inglés.
+#include "capitulos/introduccion-en.typ"
 #include "capitulos/desarrollo.typ"
 #include "capitulos/conclusiones.typ"
 // Normativa (TFG, V.4): se requieren conclusiones en inglés.

@@ -2,7 +2,7 @@
 
 Plantilla [Typst](https://typst.app) para la memoria del Trabajo de Fin de
 Grado (TFG) o de Máster (TFM) de la Facultad de Informática de la Universidad
-Complutense de Madrid. Es la hermana de [fdi-simplex](../fdi-simplex) (LaTeX):
+Complutense de Madrid. Es la hermana de fdi-simplex (LaTeX):
 mismas opciones y mismo aspecto, pero en Typst.
 
 ## Archivos
@@ -11,14 +11,23 @@ mismas opciones y mismo aspecto, pero en Typst.
 |---|---|
 | `fdi-tippex.typ` | Plantilla. Copiar junto al `.typ` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto a `fdi-tippex.typ`. |
-| `typst.toml` | Manifiesto de paquete Typst (nombre, versión). No hace falta copiarlo. |
-| `ejemplo-tfg/` | Ejemplo de **TFG**: trabajo en grupo, director/codirector, contribuciones individuales (`tfg.typ`, `Makefile`...). |
-| `ejemplo-tfm/` | Ejemplo de **TFM**: trabajo individual, tutor/cotutor, colaborador externo, convocatoria, resumen en inglés primero (`tfm.typ`, `Makefile`...). |
+
+Hay dos ejemplos completos:
+
+- **TFG** (`tfg.typ`): trabajo en grupo, director/codirector, contribuciones
+  individuales.
+- **TFM** (`tfm.typ`): trabajo individual, tutor/cotutor, colaborador externo,
+  convocatoria, resumen en inglés primero.
+
+En el repositorio cada ejemplo está en su carpeta (`ejemplo-tfg/`,
+`ejemplo-tfm/`, con su `Makefile`), junto al manifiesto de paquete
+`typst.toml`. En los zips de release la plantilla y el escudo ya están junto
+al documento.
 
 ## Uso rápido
 
 ```typst
-#import "fdi-tippex.typ": fdi-tippex, resumen, abstract, contribucion, principal
+#import "fdi-tippex.typ": fdi-tippex, resumen, abstract, contribucion, principal, apendices
 
 #show: fdi-tippex.with(
   tipo: "tfg",                          // "tfg" o "tfm"
@@ -28,13 +37,15 @@ mismas opciones y mismo aspecto, pero en Typst.
   directores: ("Prof. Nombre Director",), // tutor: "..." para TFM
   titulacion: "Ingeniería Informática",
   curso-academico: "2024/2025",
+  palabras-clave: ("palabra1", "palabra2"),
+  keywords: ("keyword1", "keyword2"),
 )
 
-#resumen(palabras-clave: [palabra1, palabra2, ...])[
+#resumen[
   Texto del resumen en castellano.
 ]
 
-#abstract(keywords: [keyword1, keyword2, ...])[
+#abstract[
   Abstract text in English.
 ]
 
@@ -58,9 +69,9 @@ o `typst watch memoria.typ` para recompilar al guardar. También se puede usar
 directamente en la [aplicación web de Typst](https://typst.app), subiendo
 `fdi-tippex.typ` y `Escudo_UCM.png` al proyecto.
 
-Los ejemplos importan la plantilla desde el directorio padre, por lo que
-necesitan `--root ..` (el `Makefile` ya lo hace). Si copias la plantilla junto
-a tu documento no hace falta.
+En el repositorio, los ejemplos importan la plantilla desde el directorio
+padre, por lo que necesitan `--root ..` (el `Makefile` ya lo hace). Con la
+plantilla junto al documento, como en los zips de release, no hace falta.
 
 ## Opciones
 
@@ -72,7 +83,7 @@ a tu documento no hace falta.
 | `idioma` | `"es"` \| `"en"` | `"es"` | Idioma principal |
 | `estilobib` | cualquier estilo de Typst o archivo `.csl` | `"chicago-author-date"` | Estilo bibliográfico |
 | `colorenlace` | un color | `rgb("00559e")` | Color de enlaces, citas y referencias (sólo `digital`) |
-| `logo` | una imagen o `none` | `image("Escudo_UCM.png")` | Escudo de la portada |
+| `logo` | `auto`, una imagen o `none` | `auto` | Escudo de la portada (`auto`: `Escudo_UCM.png` junto a la plantilla) |
 
 ### Combinar estilo y portada
 
@@ -134,22 +145,32 @@ Para la versión final:
 - `codirector` / `cotutor` — codirector o cotutor
 - `colaborador-externo` — colaborador externo (TFM)
 
+Y las palabras clave, que exige la normativa junto al resumen (máximo 10 en
+cada idioma). Se imprimen al final de `resumen` y `abstract` y van también a
+los metadatos del PDF:
+
+- `palabras-clave` — lista de palabras clave en castellano
+- `keywords` — lista de palabras clave en inglés
+
 ## Otras funciones
 
-- `resumen(palabras-clave: ..)[...]` y `abstract(keywords: ..)[...]`: resumen
-  en castellano e inglés. En el TFG va primero el resumen, en el TFM el
-  abstract.
+- `resumen[...]` y `abstract[...]`: resumen en castellano e inglés. Al final
+  imprimen las palabras clave declaradas en `fdi-tippex` (`palabras-clave` y
+  `keywords`). En el TFG va primero el resumen, en el TFM el abstract.
 - `contribucion("Autor")[...]`: contribución individual de cada autor en los
   TFG en grupo.
 - `#show: principal`: empieza la parte principal (equivale a `\mainmatter`),
   con numeración de páginas arábiga desde 1. Lo anterior va en romanos.
+- `#show: apendices`: empieza los apéndices (equivale a `\appendix`). Los
+  capítulos que siguen se numeran con letras («Apéndice A», «Figura A.1»...).
+  Normalmente va después de la bibliografía.
 
 ## Versiones
 
 Las versiones siguen la fecha de publicación, en formato `AA.M.D` (sin ceros a
 la izquierda): la `26.10.3` es la del 3 de octubre de 2026. La versión de una
-copia de la plantilla se puede consultar en la cabecera de `fdi-tippex.typ`, y
-también figura en `typst.toml`.
+copia de la plantilla se puede consultar en la cabecera de `fdi-tippex.typ`
+(en el repositorio figura también en `typst.toml`).
 
 ## Crédito y contacto
 

@@ -10,8 +10,18 @@ Madrid.
 |---|---|
 | `fdi-simplex.cls` | Clase LaTeX. Copiar junto al `.tex` principal. |
 | `Escudo_UCM.png` | Escudo UCM para la portada. Copiar junto al `.tex` principal. |
-| `ejemplo-tfg/` | Ejemplo de **TFG**: trabajo en grupo, director/codirector, contribuciones individuales (`tfg.tex`, `Makefile`...). |
-| `ejemplo-tfm/` | Ejemplo de **TFM**: trabajo individual, tutor/cotutor, colaborador externo, `\convocatoria`, resumen en inglés primero (`tfm.tex`, `Makefile`...). |
+
+Hay dos ejemplos completos:
+
+- **TFG** (`tfg.tex`): trabajo en grupo, director/codirector, contribuciones
+  individuales.
+- **TFM** (`tfm.tex`): trabajo individual, tutor/cotutor, colaborador externo,
+  `\convocatoria`, resumen en inglés primero.
+
+En el repositorio cada ejemplo está en su carpeta (`ejemplo-tfg/`,
+`ejemplo-tfm/`), con un `Makefile` que busca la plantilla en el directorio
+padre. En los zips de release la plantilla y el escudo ya están junto al
+documento.
 
 ## Uso rápido
 
@@ -24,23 +34,27 @@ Madrid.
 \director{Prof. Nombre Director}   % \tutor{...} para TFM
 \titulacion{Ingeniería Informática}
 \cursoAcademico{2024/2025}
+\palabrasClave{palabra1, palabra2, ...}
+\keywords{keyword1, keyword2, ...}
 
 \addbibresource{bibliografia.bib}
 
 \begin{document}
 \makeportada
 
+\frontmatter      % páginas en números romanos hasta \mainmatter
+
 \begin{resumen}
   Texto del resumen en castellano.
-  \palabrasClave{palabra1, palabra2, ...}
 \end{resumen}
 
 \begin{abstract}
   Abstract text in English.
-  \keywords{keyword1, keyword2, ...}
 \end{abstract}
 
 \tableofcontents
+
+\mainmatter       % numeración arábiga desde aquí
 
 \chapter{Introducción}
 ...
@@ -68,6 +82,9 @@ lualatex memoria.tex
 | `portada` | `normativa` \| `elegante` | `normativa` | Estilo de la portada |
 | `idioma` | `es` \| `en` | `es` | Idioma principal |
 | `estilobib` | cualquier estilo biblatex | `authoryear` | Estilo bibliográfico |
+| `colorenlace` | un color de xcolor o definido con `\definecolor` | `fdiLink` | Color de enlaces, citas y URLs (sólo `digital`) |
+
+Cualquier otra opción se pasa a `scrbook` (p. ej. `twoside`, `12pt`, `DIV=9`).
 
 ### Combinar estilo y portada
 
@@ -93,6 +110,15 @@ Para usar otro estilo, pásalo como opción de clase:
 Los estilos disponibles son los de biblatex; consúltese la
 [documentación de biblatex](https://ctan.org/pkg/biblatex).
 
+### Cambiar el escudo
+
+La portada busca `Escudo_UCM` junto al documento. Si se guarda en otro sitio,
+se indica la ruta en el preámbulo:
+
+```latex
+\logo{img/Escudo_UCM}
+```
+
 ## Metadatos obligatorios
 
 La normativa exige los siguientes campos en la portada:
@@ -110,6 +136,22 @@ Para la versión final:
 - `\calificacion{...}` — calificación obtenida
 - `\codirector{...}` / `\cotutor{...}` — codirector o cotutor
 - `\colaboradorExterno{...}` — colaborador externo (TFM)
+
+## Otros comandos y entornos
+
+- `resumen` y `abstract`: resumen en castellano e inglés. Al final imprimen
+  las palabras clave declaradas en el preámbulo con `\palabrasClave` y
+  `\keywords`, que van también a los metadatos del PDF. En el TFG va primero
+  el resumen, en el TFM el abstract.
+- `\begin{contribucion}{Autor} ... \end{contribucion}`: contribución
+  individual de cada autor en los TFG en grupo.
+- `\frontmatter` y `\mainmatter`: separan las páginas preliminares (resumen,
+  índice...), numeradas en romanos, de la parte principal, con numeración
+  arábiga desde 1. Sin ellos todo el documento se numera seguido en arábigos.
+  `\backmatter` deja sin numerar los capítulos finales.
+- `\appendix`: empieza los apéndices. Los capítulos que siguen se numeran
+  con letras («Apéndice A», «Figura A.1»...). Normalmente va después de la
+  bibliografía.
 
 ## Versiones
 

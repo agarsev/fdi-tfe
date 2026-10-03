@@ -28,14 +28,18 @@
 //     // tutor: "Nombre del Tutor",         // TFM
 //     titulacion: "Ingeniería Informática",
 //     curso-academico: "2024/2025",
+//     palabras-clave: ("palabra1", "palabra2"),
+//     keywords: ("keyword1", "keyword2"),
 //   )
-//   #resumen(palabras-clave: [...])[...]
-//   #abstract(keywords: [...])[...]
+//   #resumen[...]
+//   #abstract[...]
 //   #outline()
 //   #show: principal
 //   = Introducción
 //   ...
 //   #bibliography("bibliografia.bib")
+//   #show: apendices                        // si hay apéndices
+//   = Un apéndice
 //
 // Opciones:
 //   tipo: "tfg" | "tfm"               Tipo de documento (defecto: "tfg")
@@ -51,11 +55,15 @@
 //                                     habituales: "apa", "ieee", "nature".
 //   colorenlace: <color>              Color de enlaces, citas y referencias
 //                                     (sólo estilo digital).
-//   logo: <imagen> | none             Escudo de la portada. Para usar otra
-//                                     ruta: logo: image("img/escudo.png").
+//   logo: auto | <imagen> | none      Escudo de la portada (defecto: auto,
+//                                     Escudo_UCM.png junto a la plantilla).
+//                                     Para usar otra ruta:
+//                                     logo: image("img/escudo.png").
 //----------------------------------------------------------------------
 
 #let _estilo = state("fdi-tippex-estilo", "digital")
+// Palabras clave en castellano e inglés, para `resumen` y `abstract`.
+#let _claves = state("fdi-tippex-claves", (es: (), en: ()))
 
 // Tamaños de fuente: los de fdi-simplex (KOMA-Script a 11pt), de \small
 // a \huge, redondeados (el punto de Typst es un 0.4% mayor que el de TeX).
@@ -76,19 +84,21 @@
   estilobib: "chicago-author-date",
   colorenlace: rgb("00559e"),
 
-  titulo: "",
-  titulo-en: "",
+  titulo: none,
+  titulo-en: none,
   autores: (),
   directores: (),
-  codirector: "",
-  tutor: "",
-  cotutor: "",
-  colaborador-externo: "",
-  titulacion: "",
-  curso-academico: "",
-  convocatoria: "",
+  codirector: none,
+  tutor: none,
+  cotutor: none,
+  colaborador-externo: none,
+  titulacion: none,
+  curso-academico: none,
+  convocatoria: none,
   calificaciones: (),
-  logo: image("Escudo_UCM.png"),
+  palabras-clave: (),
+  keywords: (),
+  logo: auto,
 
   body,
 ) = {
@@ -100,10 +110,12 @@
   assert(idioma in ("es", "en"), message: "fdi-tippex: idioma debe ser \"es\" o \"en\"")
 
   // Admitimos tanto un valor suelto como una lista.
-  let como-lista(x) = if type(x) == array { x } else if x in ("", none) { () } else { (x,) }
+  let como-lista(x) = if type(x) == array { x } else if x == none { () } else { (x,) }
   let autores = como-lista(autores)
   let directores = como-lista(directores)
   let calificaciones = como-lista(calificaciones)
+  let palabras-clave = como-lista(palabras-clave)
+  let keywords = como-lista(keywords)
 
   let es-en = idioma == "en"
   let es-tfg = tipo == "tfg"
@@ -157,6 +169,7 @@
     title: titulo,
     author: autores.filter(a => type(a) == str),
     description: tipo-doc,
+    keywords: palabras-clave + keywords,
   )
 
   // Si las fuentes no están instaladas Typst avisa y usa las suyas.
@@ -199,9 +212,11 @@
   // - Curso académico
   // - Convocatoria y calificación si se han definido (versión final)
   //--------------------------------------------------------------------
-  let escudo = if logo != none {
+  // El escudo por defecto se carga aquí, y no como valor por defecto del
+  // parámetro, para que la plantilla se pueda importar sin tenerlo al lado.
+  let escudo = if portada != none and logo != none {
     set image(height: 3.5cm)
-    logo
+    if logo == auto { image("Escudo_UCM.png") } else { logo }
   }
 
   // Para TFG "Trabajo de Fin de Grado en X"; para TFM "Máster en X".
@@ -209,8 +224,8 @@
   let rotulo = {
     if es-tfg {
       tipo-doc
-      if titulacion != "" { rot.en + titulacion }
-    } else if titulacion != "" {
+      if titulacion != none { rot.en + titulacion }
+    } else if titulacion != none {
       rot.master + titulacion
     } else {
       tipo-doc
@@ -228,13 +243,13 @@
         if directores.len() > 0 {
           rol(if directores.len() > 1 { rot.directores } else { rot.director }, directores)
         },
-        if codirector != "" { rol(rot.codirector, (codirector,)) },
+        if codirector != none { rol(rot.codirector, (codirector,)) },
       )
     } else {
       (
-        if tutor != "" { rol(rot.tutor, (tutor,)) },
-        if cotutor != "" { rol(rot.cotutor, (cotutor,)) },
-        if colaborador-externo != "" { rol(rot.colab, (colaborador-externo,)) },
+        if tutor != none { rol(rot.tutor, (tutor,)) },
+        if cotutor != none { rol(rot.cotutor, (cotutor,)) },
+        if colaborador-externo != none { rol(rot.colab, (colaborador-externo,)) },
       )
     }
     partes.filter(p => p != none).join(v(0.4em))
@@ -243,8 +258,8 @@
   // Con una calificación: "Calificación: X". Con varias, emparejadas con
   // los autores: "Autor — Nota" (la i-ésima nota es del i-ésimo autor).
   let bloque-final = {
-    if curso-academico != "" [#rot.curso #curso-academico \ ]
-    if convocatoria != "" [#rot.convocatoria: #convocatoria \ ]
+    if curso-academico != none [#rot.curso #curso-academico \ ]
+    if convocatoria != none [#rot.convocatoria: #convocatoria \ ]
     if calificaciones.len() == 1 [
       #rot.calificacion: #calificaciones.first()
     ] else if calificaciones.len() > 1 {
@@ -274,7 +289,7 @@
       // largos partan en varias líneas legibles.
       block(width: 82%, {
         text(size: _tam.huge, weight: "bold", titulo)
-        if titulo-en != "" {
+        if titulo-en != none {
           v(2.1em)
           text(size: _tam.Large, style: "italic", titulo-en)
         }
@@ -294,7 +309,7 @@
       line(length: 75%, stroke: 0.5mm)
       v(0.4em)
       text(size: _tam.huge, weight: "bold", titulo)
-      if titulo-en != "" {
+      if titulo-en != none {
         v(0.2em)
         text(size: _tam.Large, style: "italic", titulo-en)
       }
@@ -330,19 +345,31 @@
     .any(h => h.location().page() == here().page())
 
   // En blanco: el capítulo anterior acaba en la página previa y el
-  // siguiente empieza en la posterior.
+  // siguiente empieza en la posterior. La marca de fin tiene que ser la del
+  // capítulo que empieza en la posterior: si el salto de página no llega a
+  // producirse, la marca cae en la misma página que su capítulo.
   let en-blanco() = {
     let p = here().page()
-    query(<fdi-tippex-fin>).any(m => m.location().page() == p - 1) and query(
-      heading.where(level: 1),
-    ).any(h => h.location().page() == p + 1)
+    query(<fdi-tippex-fin>).any(m => m.location().page() == p - 1 and {
+      let sig = query(heading.where(level: 1).after(m.location()))
+      sig.len() > 0 and sig.first().location().page() == p + 1
+    })
+  }
+
+  // Número de un título con su propio patrón ("1.1.", "A.1."...) y sin el
+  // punto final. `niveles` lo recorta (1: sólo el número de capítulo).
+  let numero-de(el, niveles: none) = {
+    let nums = counter(heading).at(el.location())
+    if niveles != none { nums = nums.slice(0, niveles) }
+    let n = numbering(el.numbering, ..nums)
+    if type(n) == str { n.trim(".", at: end) } else { n }
   }
 
   let capitulo-actual() = {
     let previos = query(heading.where(level: 1).before(here()))
     if previos.len() == 0 { return none }
     let cap = previos.last()
-    if cap.numbering != none [#counter(heading).at(cap.location()).first().#h(0.5em)]
+    if cap.numbering != none [#numero-de(cap).#h(0.5em)]
     cap.body
   }
 
@@ -451,11 +478,11 @@
     counter(figure.where(kind: raw)).update(0)
     set par(justify: false, first-line-indent: 0em)
     set block(spacing: 0pt)
-    let numero = if it.numbering != none { counter(heading).display("1") }
+    let numero = if it.numbering != none { numero-de(it) }
     if clasico {
       v(53.5pt)
       if numero != none {
-        block[#rot.capitulo #numero]
+        block[#it.supplement #numero]
         v(26pt)
       }
       block(it.body)
@@ -479,22 +506,40 @@
   show ref: it => {
     let el = it.element
     if el == none or el.func() != heading { return it }
-    let sup = if it.supplement == auto { el.supplement } else { it.supplement }
-    if not es-en and type(sup) == content and sup.has("text") { sup = lower(sup.text) }
-    let n = counter(heading).at(el.location()).map(str).join(".")
-    link(el.location(), [#sup~#n])
+    // Títulos sin numerar y referencias a la página: lo que haga Typst.
+    if el.numbering == none or it.form != "normal" { return it }
+    let sup = it.supplement
+    if sup == auto {
+      // Sólo el rótulo automático va en minúscula en castellano; uno
+      // explícito (`@sec[Sección]`) se respeta tal cual.
+      sup = el.supplement
+      if not es-en and type(sup) == content { sup = lower(sup) }
+    } else if type(sup) == function {
+      sup = sup(el)
+    }
+    let n = numero-de(el)
+    link(el.location(), if sup in (none, []) { n } else [#sup~#n])
   }
 
   // Las figuras flotan (arriba o abajo de la página), como en LaTeX.
+  // Se numeran por capítulo, con el número del capítulo tal como salga en
+  // su título ("Figura 2.1", "Figura A.1" en un apéndice).
   set figure(placement: auto, numbering: n => {
-    let cap = counter(heading).get().first()
-    numbering("1.1", cap, n)
+    let caps = query(heading.where(level: 1).before(here()))
+    let cap = if caps.len() > 0 and caps.last().numbering != none {
+      numero-de(caps.last(), niveles: 1)
+    } else {
+      counter(heading).get().first()
+    }
+    [#cap.#n]
   })
 
   //--------------------------------------------------------------------
-  // Índice: capítulos en negrita sin puntos, como en KOMA.
+  // Índice: capítulos en negrita sin puntos, como en KOMA. Los índices
+  // de figuras y tablas (entradas que no son títulos) quedan como están.
   //--------------------------------------------------------------------
   show outline.entry.where(level: 1): it => {
+    if it.element.func() != heading { return it }
     v(interlineado + 1em, weak: true)
     let pre = if it.prefix() != none { strong(it.prefix()) }
     link(it.element.location(),
@@ -521,6 +566,7 @@
   show bibliography: set par(first-line-indent: 0em, spacing: interlineado + 0.6em)
 
   _estilo.update(estilo)
+  _claves.update((es: palabras-clave, en: keywords))
   body
 }
 
@@ -541,10 +587,29 @@
 }
 
 //----------------------------------------------------------------------
+// Apéndices (equivale a \appendix): los capítulos pasan a numerarse con
+// letras y a llamarse "Apéndice". Se usa como
+//
+//   #show: apendices
+//
+// antes del primer apéndice, normalmente después de la bibliografía.
+//----------------------------------------------------------------------
+#let apendices(body) = {
+  counter(heading).update(0)
+  set heading(numbering: "A.1.")
+  show heading.where(level: 1): set heading(
+    supplement: context if text.lang == "en" [Appendix] else [Apéndice],
+  )
+  body
+}
+
+//----------------------------------------------------------------------
 // Resumen / Abstract, palabras clave y contribuciones
 //
 // La normativa exige ambos, en castellano y en inglés, cada uno con su
-// lista de ≤ 10 palabras clave. Aparecen en el índice sin numerar.
+// lista de ≤ 10 palabras clave. Aparecen en el índice sin numerar. Las
+// palabras clave se declaran en `fdi-tippex` (van también a los metadatos
+// del PDF) y aquí sólo se imprimen.
 //----------------------------------------------------------------------
 #let _seccion-previa(titulo, idioma: auto, body) = {
   show heading.where(level: 1): it => context {
@@ -566,22 +631,30 @@
   }
 }
 
-#let resumen(palabras-clave: none, body) = _seccion-previa("Resumen", idioma: "es", {
-  body
-  if palabras-clave != none {
+#let _palabras-clave(rotulo, idioma) = context {
+  let palabras = _claves.get().at(idioma)
+  if palabras.len() > 0 {
+    // Son cadenas, no marcado: sin esto el apóstrofo saldría recto.
+    show "'": smartquote(double: false)
     v(0.55em)
-    par(first-line-indent: 0em)[*Palabras clave:* #palabras-clave]
+    par(first-line-indent: 0em)[*#rotulo:* #palabras.join(", ")]
   }
+}
+
+#let resumen(body) = _seccion-previa("Resumen", idioma: "es", {
+  body
+  _palabras-clave("Palabras clave", "es")
 })
 
-#let abstract(keywords: none, body) = _seccion-previa("Abstract", idioma: "en", {
+#let abstract(body) = _seccion-previa("Abstract", idioma: "en", {
   body
-  if keywords != none {
-    v(0.55em)
-    par(first-line-indent: 0em)[*Keywords:* #keywords]
-  }
+  _palabras-clave("Keywords", "en")
 })
 
 // Contribución personal (TFG en grupo: la normativa exige al menos 2
 // páginas por autor describiendo su aportación individual al proyecto).
-#let contribucion(autor, body) = _seccion-previa([Contribución de #autor], body)
+// El `context` va fuera del título para que el marcador del PDF tenga texto.
+#let contribucion(autor, body) = context _seccion-previa(
+  if text.lang == "en" [Contribution of #autor] else [Contribución de #autor],
+  body,
+)

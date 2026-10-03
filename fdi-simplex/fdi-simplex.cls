@@ -24,13 +24,15 @@
 %%   \autor{Nombre Apellidos}
 %%   \director{Nombre del Director}          % TFG
 %%   % \tutor{Nombre del Tutor}              % TFM
-%%   \titulacion{Grado en Ingeniería Informática}
+%%   \titulacion{Ingeniería Informática}
 %%   \cursoAcademico{2024/2025}
+%%   \palabrasClave{...}
+%%   \keywords{...}
 %%   \addbibresource{bibliografia.bib}
 %%   \begin{document}
 %%   \makeportada
-%%   \begin{resumen} ... \palabrasClave{...} \end{resumen}
-%%   \begin{abstract} ... \keywords{...} \end{abstract}
+%%   \begin{resumen} ... \end{resumen}
+%%   \begin{abstract} ... \end{abstract}
 %%   \tableofcontents
 %%   \chapter{Introducción} ...
 %%   \printbibliography
@@ -46,8 +48,8 @@
 %%                           cualquier portada con cualquier estilo.
 %%   idioma=es|en            Idioma principal (defecto: es)
 %%   estilobib=<style>       Estilo biblatex (defecto: authoryear)
-%%                           Otros valores habituales: authoryear, numeric,
-%%                           alphabetic, ieee, chicago-authordate.
+%%                           Otros valores habituales: numeric, alphabetic,
+%%                           ieee, chicago-authordate.
 %%                           Véase https://biblatex-biber.sourceforge.net/
 %%   colorenlace=<color>     Color de enlaces, citas y URLs (defecto:
 %%                           fdiLink, un azul marino sobrio). Sólo aplica
@@ -74,6 +76,9 @@
 \DeclareStringOption[authoryear]{estilobib}
 \DeclareStringOption[fdiLink]{colorenlace}
 
+% Valores por defecto de scrbook. Van antes que las opciones del usuario
+% para que estas puedan sobrescribirlos (en KOMA gana la última).
+\PassOptionsToClass{11pt, a4paper, oneside, DIV=12, parskip=half-, numbers=noenddot}{scrbook}
 \DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{scrbook}}
 \ProcessKeyvalOptions*\relax
 
@@ -83,11 +88,12 @@
 %%----------------------------------------------------------------------
 %% 2. Clase base: scrbook (KOMA-Script). Usamos scrbook en lugar de
 %%    scrreport para disponer de \frontmatter/\mainmatter/\backmatter.
-%%    Por defecto forzamos oneside para un aspecto digital; el estilo
+%%    Por defecto usamos oneside para un aspecto digital; el estilo
 %%    clasico reactiva twoside más abajo. parskip=half- da media línea
-%%    entre párrafos sin sangría; DIV=12 da márgenes generosos.
+%%    entre párrafos sin sangría; DIV=12 da márgenes generosos. Estas
+%%    opciones se pasan en la sección 1, antes que las del usuario.
 %%----------------------------------------------------------------------
-\LoadClass[11pt, a4paper, oneside, DIV=12, parskip=half-, numbers=noenddot]{scrbook}
+\LoadClass{scrbook}
 
 %%----------------------------------------------------------------------
 %% 3. Motor y paquetes base
@@ -110,12 +116,16 @@
 
 % Babel: idioma principal configurable.
 \ifdefstring{\tfe@idioma}{en}{%
-  \RequirePackage[spanish, main=english]{babel}%
-}{%
+  \RequirePackage[spanish, main=english, shorthands=off]{babel}%
+}{\ifdefstring{\tfe@idioma}{es}{%
   \RequirePackage[english, main=spanish, shorthands=off]{babel}%
   \renewcaptionname{spanish}{\listtablename}{Índice de tablas}
   \renewcaptionname{spanish}{\tablename}{Tabla}
-}
+}{%
+  \ClassError{fdi-simplex}{%
+    Opción `idioma=\tfe@idioma' desconocida%
+  }{Valores válidos: es, en.}%
+}}
 
 \RequirePackage{graphicx}
 \RequirePackage{xcolor}
@@ -230,6 +240,7 @@
   \def\tfe@text@cursoAcademico{Academic year}%
   \def\tfe@text@convocatoria{Session}%
   \def\tfe@text@calificacion{Grade}%
+  \def\tfe@text@contribucion{Contribution of}%
 }{%
   \def\tfe@text@tipoDocTFG{Trabajo de Fin de Grado}%
   \def\tfe@text@tipoDocTFM{Trabajo de Fin de Máster}%
@@ -245,6 +256,7 @@
   \def\tfe@text@cursoAcademico{Curso académico}%
   \def\tfe@text@convocatoria{Convocatoria}%
   \def\tfe@text@calificacion{Calificación}%
+  \def\tfe@text@contribucion{Contribución de}%
 }
 
 % Tipo de documento (derivado de las opciones e idioma)
@@ -276,7 +288,7 @@
 }
 
 % Rótulo según normativa: para TFG "Trabajo de Fin de Grado en X",
-% para TFM se mantiene el tipo y se añade "Máster en X".
+% para TFM "Máster en X" (o el tipo de documento si falta la titulación).
 % Nótese que `\titulacion` recibe solo el nombre de la titulación
 % (p. ej. "Ingeniería Informática"), sin el prefijo "Grado en" ni
 % "Máster en".
@@ -289,26 +301,36 @@
   \else
     \ifdefempty{\tfe@titulacion}{%
       \ClassWarning{fdi-simplex}{Falta \string\titulacion{...}}%
+      \tfe@tipoDoc
     }{\tfe@text@prefijoMaster \tfe@titulacion}%
   \fi
   \\
   \tfe@text@facultad%
 }
 
+% Un rol de la portada ("Director:" y debajo los nombres). El primero
+% va sin separación; los siguientes, 0.4em por debajo del anterior.
+\newcommand{\tfe@portadaRol}[2]{%
+  \tfe@rolsep #1:\\ #2%
+  \def\tfe@rolsep{\\[0.4em]}%
+}
 \newcommand{\tfe@portadaDirector}{%
+  \def\tfe@rolsep{}%
   \iftfe@tfg
     \ifnumequal{\value{tfe@ndirectores}}{0}{%
       \ClassWarning{fdi-simplex}{Falta \string\director{...}}%
     }{%
-      \ifnumequal{\value{tfe@ndirectores}}{1}{\tfe@text@director}{\tfe@text@directores}:\\ \tfe@directores%
+      \tfe@portadaRol
+        {\ifnumequal{\value{tfe@ndirectores}}{1}{\tfe@text@director}{\tfe@text@directores}}%
+        {\tfe@directores}%
     }%
-    \ifdefempty{\tfe@codirector}{}{\\[0.4em] \tfe@text@codirector:\\ \tfe@codirector}%
+    \ifdefempty{\tfe@codirector}{}{\tfe@portadaRol{\tfe@text@codirector}{\tfe@codirector}}%
   \else
     \ifdefempty{\tfe@tutor}{%
       \ClassWarning{fdi-simplex}{Falta \string\tutor{...}}%
-    }{\tfe@text@tutor:\\ \tfe@tutor}%
-    \ifdefempty{\tfe@cotutor}{}{\\[0.4em] \tfe@text@cotutor:\\ \tfe@cotutor}%
-    \ifdefempty{\tfe@colabExt}{}{\\[0.4em] \tfe@text@colabExt:\\ \tfe@colabExt}%
+    }{\tfe@portadaRol{\tfe@text@tutor}{\tfe@tutor}}%
+    \ifdefempty{\tfe@cotutor}{}{\tfe@portadaRol{\tfe@text@cotutor}{\tfe@cotutor}}%
+    \ifdefempty{\tfe@colabExt}{}{\tfe@portadaRol{\tfe@text@colabExt}{\tfe@colabExt}}%
   \fi
 }
 
@@ -342,9 +364,6 @@
 % exige la normativa de la FDI, sin decoraciones.
 \newcommand{\tfe@portadaNormativa}{%
   \begin{titlepage}
-    % Sin destinos page.* en la portada: evita colisión con page.1/2
-    % cuando \mainmatter (o \frontmatter en twoside) reinicia el contador.
-    \hypersetup{pageanchor=false}%
     \centering
     \tfe@portadaEscudo\par
     \vspace{1.2cm}
@@ -375,7 +394,6 @@
 % por \vfill. Sigue cumpliendo la normativa (mismos campos).
 \newcommand{\tfe@portadaElegante}{%
   \begin{titlepage}
-    \hypersetup{pageanchor=false}%
     \centering
     \mbox{}\vfill
     \rule{0.75\textwidth}{0.5mm}\\[0.8em]
@@ -402,12 +420,19 @@
 
 % Dispatcher: elige la portada según la opción `portada`.
 \newcommand{\makeportada}{%
+  % Sin destinos page.* ni en la portada ni en su dorso en blanco (a dos
+  % caras): evita la colisión con page.1/2 cuando \mainmatter reinicia
+  % el contador.
+  \begingroup
+  \hypersetup{pageanchor=false}%
   \ifdefstring{\tfe@portada}{elegante}{\tfe@portadaElegante}{%
   \ifdefstring{\tfe@portada}{normativa}{\tfe@portadaNormativa}{%
     \ClassError{fdi-simplex}{%
-      Opción `portada=\tfe@portada' desconocida.%
+      Opción `portada=\tfe@portada' desconocida%
     }{Valores válidos: normativa, elegante.}%
   }}%
+  \cleardoublepage
+  \endgroup
 }
 \let\maketitle\makeportada
 
@@ -443,10 +468,12 @@
 \newenvironment{resumen}{%
   \tfe@abschead{Resumen}%
   \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
+  \begin{otherlanguage*}{spanish}%
 }{%
   \ifdefempty{\tfe@palabrasClave}{}{%
     \par\medskip\noindent\textbf{Palabras clave:} \tfe@palabrasClave\par
   }%
+  \end{otherlanguage*}%
   \end{addmargin}%
 }
 
@@ -455,17 +482,19 @@
 \newenvironment{abstract}{%
   \tfe@abschead{Abstract}%
   \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
+  \begin{otherlanguage*}{english}%
 }{%
   \ifdefempty{\tfe@keywords}{}{%
     \par\medskip\noindent\textbf{Keywords:} \tfe@keywords\par
   }%
+  \end{otherlanguage*}%
   \end{addmargin}%
 }
 
 % Contribución personal (TFG en grupo: normativa exige al menos 2 páginas
 % por autor describiendo su aportación individual al proyecto).
 \newenvironment{contribucion}[1]{%
-  \tfe@abschead{Contribución de #1}%
+  \tfe@abschead{\tfe@text@contribucion\ #1}%
   \begin{addmargin}[\tfe@marginextra]{\tfe@marginextra}%
 }{%
   \end{addmargin}%
@@ -515,54 +544,63 @@
   % Fuente: Lora. Si no está instalada, avisamos fuerte para que el
   % estudiante lo sepa (nada de fallback silencioso). Usamos la versión
   % variable del archivo para poder pedir un peso SemiBold (600) para
-  % los encabezados y Bold (700) para el \textbf normal.
-  \IfFontExistsTF{Lora}{%
-    % La cursiva es un archivo aparte (Lora-Italic). Si falta, avisamos
-    % y seguimos con la recta en su lugar para no romper la compilación.
-    \IfFontExistsTF{Lora Italic}{%
-      \def\tfe@loraIt{Lora Italic}%
+  % los encabezados y Bold (700) para el \textbf normal. Sólo con LuaLaTeX
+  % o XeLaTeX: \IfFontExistsTF es de fontspec.
+  \iftutex
+    \IfFontExistsTF{Lora}{%
+      % La cursiva es un archivo aparte (Lora-Italic). Si falta, avisamos
+      % y seguimos con la recta en su lugar para no romper la compilación.
+      \IfFontExistsTF{Lora Italic}{%
+        \def\tfe@loraIt{Lora Italic}%
+      }{%
+        \def\tfe@loraIt{Lora}%
+        \ClassWarningNoLine{fdi-simplex}{%
+          Falta la cursiva de Lora (Lora Italic):\MessageBreak
+          el texto en cursiva saldra en redonda.\MessageBreak
+          Instala la familia completa desde\MessageBreak
+          https://fonts.google.com/specimen/Lora%
+        }%
+      }%
+      \setmainfont{Lora}[%
+        Ligatures=TeX,
+        BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
+        ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=400}}},
+        BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
+      ]%
+      \newfontfamily\tfe@dispfont{Lora}[%
+        Ligatures=TeX,
+        UprightFeatures={RawFeature={axis={wght=600}}},
+        BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
+        ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=600}}},
+        BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
+      ]%
+      \setkomafont{disposition}{\normalcolor\tfe@dispfont}%
     }{%
-      \def\tfe@loraIt{Lora}%
       \ClassWarningNoLine{fdi-simplex}{%
-        Falta la cursiva de Lora (Lora Italic):\MessageBreak
-        el texto en cursiva saldra en redonda.\MessageBreak
-        Instala la familia completa desde\MessageBreak
-        https://fonts.google.com/specimen/Lora%
+        La fuente Lora no se ha encontrado.\MessageBreak
+        Instalala desde https://fonts.google.com/specimen/Lora, o\MessageBreak
+        cambia la fuente con \protect\setmainfont{...} en tu preambulo%
+      }%
+      \addtokomafont{disposition}{\rmfamily}%
+    }%
+
+    % Monoespaciada: IBM Plex Mono. Aviso fuerte si no está instalada.
+    \IfFontExistsTF{IBM Plex Mono}{%
+      \setmonofont{IBM Plex Mono}[Scale=MatchLowercase]%
+    }{%
+      \ClassWarningNoLine{fdi-simplex}{%
+        La fuente IBM Plex Mono no se ha encontrado.\MessageBreak
+        Instalala desde https://fonts.google.com/specimen/IBM+Plex+Mono, o\MessageBreak
+        cambia la fuente con \protect\setmonofont{...} en tu preambulo%
       }%
     }%
-    \setmainfont{Lora}[%
-      Ligatures=TeX,
-      BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
-      ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=400}}},
-      BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
-    ]%
-    \newfontfamily\tfe@dispfont{Lora}[%
-      Ligatures=TeX,
-      UprightFeatures={RawFeature={axis={wght=600}}},
-      BoldFont={Lora}, BoldFeatures={RawFeature={axis={wght=700}}},
-      ItalicFont={\tfe@loraIt}, ItalicFeatures={RawFeature={axis={wght=600}}},
-      BoldItalicFont={\tfe@loraIt}, BoldItalicFeatures={RawFeature={axis={wght=700}}},
-    ]%
-    \setkomafont{disposition}{\normalcolor\tfe@dispfont}%
-  }{%
+  \else
     \ClassWarningNoLine{fdi-simplex}{%
-      La fuente Lora no se ha encontrado.\MessageBreak
-      Instalala desde https://fonts.google.com/specimen/Lora, o\MessageBreak
-      cambia la fuente con \protect\setmainfont{...} en tu preambulo%
+      El estilo digital necesita LuaLaTeX para usar Lora e\MessageBreak
+      IBM Plex Mono; con pdfLaTeX se usan las fuentes por defecto%
     }%
     \addtokomafont{disposition}{\rmfamily}%
-  }%
-
-  % Monoespaciada: IBM Plex Mono. Aviso fuerte si no está instalada.
-  \IfFontExistsTF{IBM Plex Mono}{%
-    \setmonofont{IBM Plex Mono}[Scale=MatchLowercase]%
-  }{%
-    \ClassWarningNoLine{fdi-simplex}{%
-      La fuente IBM Plex Mono no se ha encontrado.\MessageBreak
-      Instalala desde https://fonts.google.com/specimen/IBM+Plex+Mono, o\MessageBreak
-      cambia la fuente con \protect\setmonofont{...} en tu preambulo%
-    }%
-  }%
+  \fi
 
   % Interlineado onehalf y sangría tradicional de párrafo en vez del
   % espacio entre párrafos que trae KOMA por defecto (parskip=half-).
@@ -662,7 +700,7 @@
   % de capítulo (como un libro).
   \KOMAoptions{parskip=false, twoside=true, open=right, chapterprefix=true, DIV=8, BCOR=7mm}%
   % Ajuste vertical fino: KOMA DIV=8 da top≈37mm y bottom≈74mm (ratio 1:2);
-  % desplazamos el bloque 10mm hacia abajo y lo extendemos 20mm para aproximar
+  % desplazamos el bloque 8mm hacia abajo y lo extendemos 14mm para aproximar
   % el layout de TeXiS (book 11pt a4paper): top≈47mm, bottom≈44mm.
   \addtolength{\topmargin}{8mm}%
   \addtolength{\textheight}{14mm}%
@@ -698,7 +736,7 @@
   % minimo: KOMA puro, sin customización adicional.
 }{%
   \ClassError{fdi-simplex}{%
-    Opción `estilo=\tfe@estilo' desconocida.%
+    Opción `estilo=\tfe@estilo' desconocida%
   }{Valores válidos: digital, minimo, clasico.}%
 }}}
 
@@ -722,13 +760,17 @@
 \tfe@hyperrefSetup
 % `pdfusetitle' no basta: sólo captura \title y \author si se llaman
 % después de cargar hyperref, y aquí \titulo y \autor no pasan por
-% ellos. Fijamos título y autores explícitamente.
+% ellos. Fijamos título y autores explícitamente. Las palabras clave en
+% los dos idiomas van separadas por `; ' (sólo si hay de los dos).
 \AtBeginDocument{%
+  \ifdefempty{\tfe@palabrasClave}{\let\tfe@pdfkeywords\tfe@keywords}{%
+    \ifdefempty{\tfe@keywords}{\let\tfe@pdfkeywords\tfe@palabrasClave}{%
+      \edef\tfe@pdfkeywords{\expandonce\tfe@palabrasClave; \expandonce\tfe@keywords}}}%
   \hypersetup{%
     pdftitle={\@title},%
     pdfauthor={\tfe@autoresPlain},%
     pdfsubject={\tfe@tipoDoc},%
-    pdfkeywords={\tfe@palabrasClave; \tfe@keywords}%
+    pdfkeywords={\tfe@pdfkeywords}%
   }%
 }
 
